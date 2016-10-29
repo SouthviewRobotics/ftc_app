@@ -34,6 +34,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -62,6 +63,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
     final double CLAW_SPEED = 0.02;// sets rate to move servo
     static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
     private ElapsedTime runtime = new ElapsedTime();
+    private boolean forkExtended = false;
     static final double FORWARD_SPEED = 0.6;
     static final double MAX_POS = 1.0;     // Maximum rotational position
     static final double MIN_POS = 0.0;     // Minimum rotational position
@@ -80,6 +82,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         robot.init(hardwareMap); //Maps hardware
         robot.pushLeft.setPosition(1);
         robot.pushRight.setPosition(-1);
+        robot.forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
@@ -119,8 +122,8 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         //robot.forkRaise.setPower(FORWARD_SPEED);
         //while (gamepad1.left_bumper && (runtime.seconds() < 3.0))
         // {
-        telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
-        telemetry.update();
+/*        telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+        telemetry.update();*/
         //}
         if (gamepad1.a) {
             robot.pushRight.setPosition(1);
@@ -128,22 +131,52 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         if (gamepad1.b) {
             robot.pushLeft.setPosition(-1);
         }
-        if (gamepad1.left_bumper) {
+        // Extend forklift
+        if (gamepad1.left_bumper && !forkExtended) {
+            telemetry.addData("Extending forklift!", "");
             robot.forkRight.setPower(.5);//Forklift in
             robot.forkLeft.setPower(.5);//Forklift out
             runtime.reset();
-            while (runtime.seconds() < 2.0) {
+            while (runtime.seconds() < 3.0) {
                 telemetry.addData("%2.5f S Elapsed", runtime.seconds());
-                telemetry.update();
             }
             robot.forkRight.setPower(0);
             robot.forkLeft.setPower(0);//Stop Motor
+            forkExtended = true;
+        } else if (gamepad1.left_bumper && forkExtended) {
+            telemetry.addData("Forklift is already extended", "");
         }
-        // Right Bumper
-       // if (gamepad1.right_bumper) {
-            //robot.forkRaise.setTargetPosition(1440); //Raises forklift
-       // }
+
+        // Retract forklift
+        if (gamepad1.right_bumper && forkExtended) {
+            telemetry.addData("Retracting forklift!", "");
+            robot.forkRight.setPower(-.5);//Forklift in
+            robot.forkLeft.setPower(-.5);//Forklift out
+            runtime.reset();
+            while (runtime.seconds() < 3.0) {
+                telemetry.addData("%2.5f S Elapsed", runtime.seconds());
+            }
+            robot.forkRight.setPower(0);
+            robot.forkLeft.setPower(0);//Stop Motor
+            forkExtended = false;
+        } else if (gamepad1.right_bumper && !forkExtended) {
+            telemetry.addData("Forklift is already retracted", "");
+        }
+        //Raises forklift for x amount of time
+        if (gamepad1.dpad_up) {
+            robot.forkRaise.setTargetPosition(1120);//Forklift in
+            robot.forkRaise.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.forkRaise.setPower(.5);
+        }
+
+        if (gamepad1.dpad_down) {
+            //robot.forkRaise.setPower(0);
+            robot.forkRaise.setTargetPosition(0);
+        }
+
+        telemetry.update();
     }
+
     // Send telemetry message to signify robot running;
     //       telemetry.addData("claw",  "Offset = %.2f", clawOffset);
     // telemetry.addData("left drive motor power: ", "%.2f", leftDriveMotorPower);
@@ -156,6 +189,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
      */
     @Override
     public void stop() {
-    }
 
+
+    }
 }
