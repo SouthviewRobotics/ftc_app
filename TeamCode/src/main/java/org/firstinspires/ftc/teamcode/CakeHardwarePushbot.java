@@ -79,6 +79,7 @@ public class CakeHardwarePushbot
         forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         /*armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        //TODO Move the servo initialize from the TeleOp to here.
         // Define and initialize ALL installed servos.
         leftClaw = hwMap.servo.get("left_hand");
         rightClaw = hwMap.servo.get("right_hand");
