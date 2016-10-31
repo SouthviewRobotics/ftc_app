@@ -172,15 +172,10 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
             robot.forkRaise.setTargetPosition(0);
         }
 
-        telemetry.update();
+        telemetry.addData("left drive motor power: ", "%.2f", leftDriveMotorPower);
+        telemetry.addData("right drive motor power: ", "%.2f", rightDriveMotorPower);
+        updateTelemetry(telemetry);
     }
-
-    // Send telemetry message to signify robot running;
-    //       telemetry.addData("claw",  "Offset = %.2f", clawOffset);
-    // telemetry.addData("left drive motor power: ", "%.2f", leftDriveMotorPower);
-    // telemetry.addData("right drive motor power: ", "%.2f", rightDriveMotorPower);
-    //updateTelemetry(telemetry);
-    // }
 
     /*
      * Code to run ONCE after the driver hits STOP
