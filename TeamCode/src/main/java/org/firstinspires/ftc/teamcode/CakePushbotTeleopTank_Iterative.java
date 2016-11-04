@@ -64,6 +64,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
     static final int COUNTS_PER_MOTOR_REV = 1120;    // eg: AndyMark Motor Encoder
     private ElapsedTime runtime = new ElapsedTime();
     private boolean forkExtended = false;
+    private double runTime;
     int forkMoveDistance = COUNTS_PER_MOTOR_REV * 1;
     static final double FORWARD_SPEED = 0.6;
     static final double MAX_POS = 1.0;     // Maximum rotational position
@@ -135,30 +136,28 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
             robot.forkRight.setPower(.5);//Forklift out
             robot.forkLeft.setPower(.5);//Forklift out
             runtime.reset();
-            while (runtime.seconds() < 3.0) {
-                telemetry.addData("%2.5f S Elapsed", runtime.seconds());
-            }
+            runTime = 4;
+            telemetry.addData("%2.5f S Elapsed", runtime.seconds());
+        }
+        if (!forkExtended && runTime != 0 && runtime.seconds() >= runTime) {
             robot.forkRight.setPower(0);
             robot.forkLeft.setPower(0);//Stop Motor
             forkExtended = true;
-        } else if (gamepad1.left_bumper && forkExtended) {
-            telemetry.addData("Forklift is already extended", "");
+            runTime = 0;
         }
-
         // Retract forklift
         if (gamepad1.right_bumper && forkExtended) {
             telemetry.addData("Retracting forklift!", "");
             robot.forkRight.setPower(-.5);//Forklift in
             robot.forkLeft.setPower(-.5);//Forklift out
             runtime.reset();
-            while (runtime.seconds() < 3.0) {
-                telemetry.addData("%2.5f S Elapsed", runtime.seconds());
-            }
+            runTime = 4;
+        }
+        if (forkExtended && runTime != 0 && runtime.seconds() >= runTime) {
             robot.forkRight.setPower(0);
             robot.forkLeft.setPower(0);//Stop Motor
             forkExtended = false;
-        } else if (gamepad1.right_bumper && !forkExtended) {
-            telemetry.addData("Forklift is already retracted", "");
+            runTime = 0;
         }
         //Raises forklift using encoders
         if (gamepad1.dpad_up) {
