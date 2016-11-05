@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.text.method.Touch;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -28,6 +31,7 @@ public class CakeHardwarePushbot
     public Servo    pushRight    = null;
     public Servo    pushLeft   = null;
     public DcMotor  forkRaise = null;
+    public TouchSensor forkStop = null;
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -51,6 +55,7 @@ public class CakeHardwarePushbot
         forkRight = hwMap.dcMotor.get("forklift right");
         forkLeft = hwMap.dcMotor.get("forklift left");
         forkRaise = hwMap.dcMotor.get("fork raise");
+        forkStop = hwMap.touchSensor.get("fork stop");
 
         //armMotor    = hwMap.dcMotor.get("left_arm");
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
@@ -65,11 +70,11 @@ public class CakeHardwarePushbot
         forkRight.setPower(0);
         forkRaise.setPower(0);
         //armMotor.setPower(0);
-
         forkRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         forkLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         forkRaise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        // Set senors
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
