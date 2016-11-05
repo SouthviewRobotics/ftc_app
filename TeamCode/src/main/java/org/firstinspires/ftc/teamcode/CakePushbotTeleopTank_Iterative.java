@@ -45,8 +45,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * All device access is managed through the HardwarePushbot class.
  * <p>
  * This particular OpMode executes a basic Tank Drive Teleop for a PushBot
- * It raises and lowers the claw using the Gampad Y and A buttons respectively.
- * It also opens and closes the claws slowly using the left and right Bumper buttons.
+ * It raises and lowers the Winch using the Dpad up and Dpad down respectively.
+ * It also extends and retracts the forklift extenders using the left and right Bumper buttons.
  * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
@@ -58,18 +58,12 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
 
     /* Declare OpMode members. */
     CakeHardwarePushbot robot = new CakeHardwarePushbot(); // use the class created to define a Pushbot's hardware
-    // could also use HardwarePushbotMatrix class.
-    double clawOffset = 0.0;                  // Servo mid position
-    final double CLAW_SPEED = 0.02;// sets rate to move servo
     static final int COUNTS_PER_MOTOR_REV = 1120;    // eg: AndyMark Motor Encoder
+    final double SECONDS_TO_EXTEND = 4;
     private ElapsedTime runtime = new ElapsedTime();
     private boolean forkExtended = false;
     private double runTime;
     int forkMoveDistance = COUNTS_PER_MOTOR_REV * 1;
-    static final double FORWARD_SPEED = 0.6;
-    static final double MAX_POS = 1.0;     // Maximum rotational position
-    static final double MIN_POS = 0.0;     // Minimum rotational position
-    double position = (MAX_POS - MIN_POS) / 2;
     double leftDriveMotorPower = 0; //defines variable
     double rightDriveMotorPower = 0;
 
@@ -101,8 +95,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         telemetry.addData("Say", "Hello Driver");    //
         updateTelemetry(telemetry);
     }
-
-    /*
+   /*
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
      */
     @Override
@@ -141,34 +134,30 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
             robot.pushLeft.setPosition(-1);
         }
         // Extend forklift
-        if (gamepad1.left_bumper && !forkExtended) {
-            telemetry.addData("Extending forklift!", "");
+        if (gamepad1.left_bumper && ForkState.retracted == forkState) {
             robot.forkRight.setPower(.5);//Forklift out
             robot.forkLeft.setPower(.5);//Forklift out
             runtime.reset();
-            runTime = 4;
-            telemetry.addData("%2.5f S Elapsed", runtime.seconds());
+            forkState = ForkState.moving;
         }
-        if (!forkExtended && runTime != 0 && runtime.seconds() >= runTime) {
-            robot.forkRight.setPower(0);
-            robot.forkLeft.setPower(0);//Stop Motor
-            forkExtended = true;
-            runTime = 0;
-        }
+
         // Retract forklift
-        if (gamepad1.right_bumper && forkExtended) {
-            telemetry.addData("Retracting forklift!", "");
+        if (gamepad1.right_bumper && ForkState.extended == forkState) {
             robot.forkRight.setPower(-.5);//Forklift in
             robot.forkLeft.setPower(-.5);//Forklift out
             runtime.reset();
-            runTime = 4;
+            forkState = ForkState.moving;
         }
-        if (forkExtended && runTime != 0 && runtime.seconds() >= runTime) {
+        if (ForkState.moving == forkState && runtime.seconds() >= SECONDS_TO_EXTEND) {
+            if (robot.forkLeft.getPower() >= 0){
+                forkState = ForkState.extended;
+            }else{
+                forkState = ForkState.retracted;
+            }
             robot.forkRight.setPower(0);
             robot.forkLeft.setPower(0);//Stop Motor
-            forkExtended = false;
-            runTime = 0;
         }
+        telemetry.addData("ForkState", "%s", forkState);
         //Raises forklift using encoders
         if (gamepad1.dpad_up) {
             robot.forkRaise.setTargetPosition(forkMoveDistance);//Forklift in
