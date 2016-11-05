@@ -73,6 +73,16 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
     double leftDriveMotorPower = 0; //defines variable
     double rightDriveMotorPower = 0;
 
+    // Valid states for the forklift.
+    private  enum ForkState {
+        extended,
+        retracted,
+        moving
+    }
+
+    // Assume we start retracted.
+    ForkState forkState = ForkState.retracted;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -173,7 +183,6 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
 
         telemetry.addData("left drive motor power: ", "%.2f", leftDriveMotorPower);
         telemetry.addData("right drive motor power: ", "%.2f", rightDriveMotorPower);
-        updateTelemetry(telemetry);
     }
 
     /*
