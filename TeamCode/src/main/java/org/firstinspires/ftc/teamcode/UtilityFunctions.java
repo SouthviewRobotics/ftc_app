@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
  * Created by Ron on 10/31/2016.
  * Collection of functions for use in any opmode.
  */
-public class UtilityFunctions {
+class UtilityFunctions {
     public UtilityFunctions() {
     }
 

@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.text.method.Touch;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -21,7 +18,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
 
  */
-public class CakeHardwarePushbot
+class CakeHardwarePushbot
 {
     /* Public OpMode members. */
     public DcMotor  leftMotor   = null;
@@ -34,7 +31,7 @@ public class CakeHardwarePushbot
     public TouchSensor forkStop = null;
 
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
+    private HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
     /* Constructor */
