@@ -188,7 +188,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
 
     // Use this at init to make sure the forklift is retracted. Uses the touch sensor.
     public void RetractForkLift() {
-        telemetry.addData("Touch","%s pressed = %s",  robot.forkStop.getDeviceName(), robot.forkStop.isPressed());
+        telemetry.addData("Touch", "%s pressed = %s", robot.forkStop.getDeviceName(), robot.forkStop.isPressed());
         while (!robot.forkStop.isPressed()) {
             robot.forkLeft.setPower(.2);
             robot.forkRight.setPower(.2);
