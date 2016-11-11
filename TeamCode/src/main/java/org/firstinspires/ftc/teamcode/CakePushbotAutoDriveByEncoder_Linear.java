@@ -104,9 +104,9 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         encoderDrive(DRIVE_SPEED, 12, 12, 2.0);
-        encoderDrive(TURN_SPEED, 6, -6, 2.0);
+        encoderDrive(TURN_SPEED, 1.5, -1.5, 2.0);
         encoderDrive(DRIVE_SPEED, 23, 23, 2.0);
-        encoderDrive(DRIVE_SPEED, 3, -3, 2.0);
+        encoderDrive(DRIVE_SPEED, .75, -.75, 2.0);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
