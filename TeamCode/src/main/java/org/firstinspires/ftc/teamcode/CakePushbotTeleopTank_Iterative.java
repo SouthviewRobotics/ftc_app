@@ -58,7 +58,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
     /* Declare OpMode members. */
     private CakeHardwarePushbot robot = new CakeHardwarePushbot(); // use the class created to define a Pushbot's hardware
     private static final int COUNTS_PER_MOTOR_REV = 1120;    // eg: AndyMark Motor Encoder
-    private static int liftAngle = 45;
+    private static int liftAngle = 180;
     private ElapsedTime runtime = new ElapsedTime();
     private int forkRaiseDistance = COUNTS_PER_MOTOR_REV / (360 / liftAngle);
 
@@ -190,9 +190,9 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
     public void RetractForkLift() {
         telemetry.addData("Touch", "%s pressed = %s", robot.forkStop.getDeviceName(), robot.forkStop.isPressed());
         runtime.reset();
-        while (!robot.forkStop.isPressed() && runtime.seconds() <= 3) {
-            robot.forkLeft.setPower(-.2);
-            robot.forkRight.setPower(-.2);
+        while (!robot.forkStop.isPressed() && runtime.seconds() <= 5) {
+            robot.forkLeft.setPower(-.1);
+            robot.forkRight.setPower(-.1);
         }
 
         robot.forkLeft.setPower(0);
