@@ -92,7 +92,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        telemetry.addData("Waaiting for Start","");
+        telemetry.addData("Waiting for Start","");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
