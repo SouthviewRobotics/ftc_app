@@ -54,6 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class TestAutoMenu extends LinearOpMode {
 
     /* Declare OpMode members. */
+    private CakeHardwarePushbot robot = new CakeHardwarePushbot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
     private int startDelay = 0;
 
@@ -67,10 +68,11 @@ public class TestAutoMenu extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Menu", "x for Blue, b for Red, dpad left or right for delay");
-        telemetry.addData("Finished","Press start");
-        telemetry.addData("Status", "Alliance %s Delay %d", alliance, startDelay);
-        telemetry.update();
+         /*
+         * Initialize the drive system variables.
+         * The init() method of the hardware class does all the work here
+         */
+        robot.init(hardwareMap);
 
         // Loop so driver can make selections.
         while (!gamepad1.start && alliance != AllianceColor.None) {
@@ -83,12 +85,18 @@ public class TestAutoMenu extends LinearOpMode {
             }
 
             if (gamepad1.dpad_left) {
-                startDelay = startDelay > 0 ? startDelay -- : startDelay;
+                startDelay = startDelay > 0 ? startDelay-- : startDelay;
             }
 
             if (gamepad1.dpad_right) {
                 startDelay = startDelay < 20 ? startDelay++ : startDelay;
             }
+
+            telemetry.addData("Menu", "x for Blue, b for Red, dpad left or right for delay");
+            telemetry.addData("Finished", "Press gamepad Start");
+            telemetry.addData("Selected", "Alliance %s Delay %d", alliance, startDelay);
+            telemetry.update();
+            idle();
         }
 
         // Wait for the game to start (driver presses PLAY)
@@ -100,6 +108,7 @@ public class TestAutoMenu extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Status", "Alliance %s Delay %d", alliance, startDelay);
             telemetry.update();
+            idle();
         }
     }
 }
