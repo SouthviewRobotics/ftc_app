@@ -89,8 +89,8 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         idle();
 
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         telemetry.addData("Waiting for Start","");
         telemetry.update();
@@ -139,8 +139,8 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.rightMotor.setTargetPosition(newRightTarget);
 
             // Turn On RUN_TO_POSITION
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // reset the timeout time and start motion.
             runtime.reset();
@@ -166,8 +166,8 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.leftMotor.setPower(0);
             idle();
             // Turn off RUN_TO_POSITION
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             sleep(250);   // optional pause after each move
         }
