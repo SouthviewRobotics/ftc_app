@@ -67,7 +67,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     static final double COUNTS_PER_MOTOR_REV = 1120;    // AndyMark Motor Encoder
     static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-    static final double WHEEL_DIAMETER_INCHES = 3.8;     // For figuring circumference
+    static final double WHEEL_DIAMETER_INCHES = 3.9;     // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.14159);
     static final double DRIVE_SPEED = 0.6;
@@ -106,10 +106,11 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED, 40, 40, 4.0);
-//        encoderDrive(TURN_SPEED, .375, -.375, 2.0);
-//        encoderDrive(DRIVE_SPEED, 23, 23, 2.0);
-//        encoderDrive(TURN_SPEED, .375, -.375, 2.0);
+        encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
+        encoderDrive(TURN_SPEED, 10, -10, 5.0);
+        encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
+        encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
+        encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -143,8 +144,8 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.leftMotor.setPower(Math.abs(speed));
             robot.rightMotor.setPower(Math.abs(speed));
+            robot.leftMotor.setPower(Math.abs(speed));
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             while (opModeIsActive() &&
@@ -161,8 +162,8 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             }
 
             // Stop all motion;
-            robot.leftMotor.setPower(0);
             robot.rightMotor.setPower(0);
+            robot.leftMotor.setPower(0);
             idle();
             // Turn off RUN_TO_POSITION
             robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
