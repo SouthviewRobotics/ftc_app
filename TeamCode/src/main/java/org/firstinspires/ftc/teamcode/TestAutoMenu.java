@@ -75,7 +75,7 @@ public class TestAutoMenu extends LinearOpMode {
         robot.init(hardwareMap);
 
         // Loop so driver can make selections.
-        while (!gamepad1.start && alliance != AllianceColor.None) {
+        while (!gamepad1.start && (alliance == AllianceColor.None)) {
             if (gamepad1.x) {
                 alliance = AllianceColor.Blue;
             }
@@ -96,6 +96,7 @@ public class TestAutoMenu extends LinearOpMode {
             telemetry.addData("Finished", "Press gamepad Start");
             telemetry.addData("Selected", "Alliance %s Delay %d", alliance, startDelay);
             telemetry.update();
+            sleep(50);
             idle();
         }
 
