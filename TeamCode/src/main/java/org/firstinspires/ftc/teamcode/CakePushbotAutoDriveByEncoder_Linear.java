@@ -64,6 +64,9 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     /* Declare OpMode members. */
     private CakeHardwarePushbot robot = new CakeHardwarePushbot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
+    private AutonomousConfiguration autoConfig = new AutonomousConfiguration(gamepad1, telemetry);
+    private AutonomousConfiguration.AllianceColor alliance = AutonomousConfiguration.AllianceColor.None;
+    private int startDelay = 0;
 
     static final double COUNTS_PER_MOTOR_REV = 1120;    // AndyMark Motor Encoder
     static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
@@ -92,11 +95,17 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        telemetry.addData("Waiting for Start","");
+        // Get configuration selections from the driver.
+        autoConfig.ShowMenu();
+        this.alliance = autoConfig.getAlliance();
+        this.startDelay = autoConfig.getStartDelay();
+
+        telemetry.addData("Waiting for Start", "");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        sleep(this.startDelay * 1000);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Path", "Starting at %7d :%7d",
@@ -133,8 +142,14 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
             // Determine new target position, and pass to motor controller
-            newLeftTarget = robot.leftMotor.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
             newRightTarget = robot.rightMotor.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+            newLeftTarget = robot.leftMotor.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+            // Assume parameters are for Blue alliance
+            if (this.alliance == AutonomousConfiguration.AllianceColor.Red) {
+                newLeftTarget = -newLeftTarget;
+                newRightTarget = -newRightTarget;
+            }
+
             robot.leftMotor.setTargetPosition(newLeftTarget);
             robot.rightMotor.setTargetPosition(newRightTarget);
 
@@ -153,11 +168,12 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
                     (robot.leftMotor.isBusy() && robot.rightMotor.isBusy())) {
 
                 // Display it for the driver.
-                telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
-                telemetry.addData("Path2", "Running at %7d :%7d",
+                telemetry.addData("Path", "Running to %7d :%7d", newLeftTarget, newRightTarget);
+                telemetry.addData("", "Running at %7d :%7d",
                         robot.leftMotor.getCurrentPosition(),
                         robot.rightMotor.getCurrentPosition()
                 );
+
                 telemetry.update();
             }
 
