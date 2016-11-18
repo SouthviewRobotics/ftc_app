@@ -19,6 +19,7 @@ public class AutonomousConfiguration {
         this.gamepad1 = gamepad;
         this.telemetry = telemetry1;
         alliance = AllianceColor.None;
+        // Default selections if driver does not select any.
         startPosition = StartPosition.Center;
         parkLocation = ParkLocation.Ramp;
         pressBeacon = PressBeacon.No;
@@ -33,23 +34,30 @@ public class AutonomousConfiguration {
         return startDelay;
     }
 
-    public void setStartDelay(int startDelay) {
-        this.startDelay = startDelay;
-    }
-
     public AllianceColor getAlliance() {
         return alliance;
     }
 
-    public void setAlliance(AllianceColor alliance) {
-        this.alliance = alliance;
+    public StartPosition getStartPosition() {
+        return startPosition;
+    }
+
+    public ParkLocation getParkLocation() {
+        return parkLocation;
+    }
+
+    public PressBeacon getPressBeacon() {
+        return pressBeacon;
     }
 
     // Where do we place the robot
     public enum StartPosition {
         Center,
-        Left,
-        Right
+        Left;
+
+        public StartPosition getNext() {
+            return values()[(ordinal() + 1) % values().length];
+        }
     }
 
     // Where do we park
@@ -76,7 +84,8 @@ public class AutonomousConfiguration {
     private PressBeacon pressBeacon;
 
     public void ShowMenu() {
-        while (alliance == AllianceColor.None) {
+        //
+        do {
             if (gamepad1.x) {
                 alliance = AllianceColor.Blue;
             }
@@ -93,13 +102,16 @@ public class AutonomousConfiguration {
                 startDelay = startDelay < 20 ? startDelay++ : startDelay;
             }
 
+            if (gamepad1.y) {
+                startPosition = startPosition.getNext();
+            }
+
             telemetry.addData("Menu", "x for Blue, b for Red, dpad left or right for delay");
+            telemetry.addData("", "y to cycle start position");
             telemetry.addData("Finished", "Press gamepad Start");
             telemetry.addData("Selected", "Alliance %s Delay %d", alliance, startDelay);
+            telemetry.addData("","Start position %s", startPosition);
             telemetry.update();
-            if (gamepad1.start) {
-                break;
-            }
-        }
+        } while (!gamepad1.start && alliance == AllianceColor.None);
     }
 }

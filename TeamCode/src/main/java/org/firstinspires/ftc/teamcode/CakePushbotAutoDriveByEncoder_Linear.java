@@ -66,6 +66,9 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private AutonomousConfiguration autoConfig;
     private AutonomousConfiguration.AllianceColor alliance = AutonomousConfiguration.AllianceColor.None;
+    private AutonomousConfiguration.StartPosition startPosition;
+    private AutonomousConfiguration.ParkLocation parkLocation;
+    private AutonomousConfiguration.PressBeacon pressBeacon;
     private int startDelay = 0;
 
     static final double COUNTS_PER_MOTOR_REV = 1120;    // AndyMark Motor Encoder
@@ -91,21 +94,28 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         idle();
-
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        idle();
 
         // Get configuration selections from the driver.
         autoConfig = new AutonomousConfiguration(gamepad1, telemetry);
         autoConfig.ShowMenu();
+        // Alliance adjustment is in the encoderDrive() method.
         this.alliance = autoConfig.getAlliance();
         this.startDelay = autoConfig.getStartDelay();
+        this.startPosition = autoConfig.getStartPosition();
+        this.parkLocation = autoConfig.getParkLocation();
+        this.pressBeacon = autoConfig.getPressBeacon();
 
+        telemetry.addData("Alliance/Delay", "%s - %d seconds", this.alliance, this.startDelay);
+        telemetry.addData("Start Position", "%s", this.startPosition);
         telemetry.addData("Waiting for Start", "");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        // Delay if driver requested.
         sleep(this.startDelay * 1000);
 
         // Send telemetry message to indicate successful Encoder reset
@@ -114,13 +124,25 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
                 robot.rightMotor.getCurrentPosition());
         telemetry.update();
 
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
-        encoderDrive(TURN_SPEED, 10, -10, 5.0);
-        encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
-        encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
-        encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
+        // Start Center - Park Ramp
+        if (this.startPosition == AutonomousConfiguration.StartPosition.Center &&
+                this.parkLocation == AutonomousConfiguration.ParkLocation.Ramp) {
+            encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
+            encoderDrive(TURN_SPEED, 10, -10, 5.0);
+            encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
+            encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
+            encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
+        }
+
+        // Start Left - Park Ramp
+        if (this.startPosition == AutonomousConfiguration.StartPosition.Left &&
+                this.parkLocation == AutonomousConfiguration.ParkLocation.Ramp) {
+            encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
+            encoderDrive(TURN_SPEED, 10, -10, 5.0);
+            encoderDrive(DRIVE_SPEED, 24, 24, 5.0);
+            encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
+            encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
+        }
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -154,10 +176,6 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.leftMotor.setTargetPosition(newLeftTarget);
             robot.rightMotor.setTargetPosition(newRightTarget);
 
-            // Turn On RUN_TO_POSITION
-//            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
             // reset the timeout time and start motion.
             runtime.reset();
             robot.rightMotor.setPower(Math.abs(speed));
@@ -182,10 +200,6 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.rightMotor.setPower(0);
             robot.leftMotor.setPower(0);
             idle();
-            // Turn off RUN_TO_POSITION
-//            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
             sleep(250);   // optional pause after each move
         }
     }
