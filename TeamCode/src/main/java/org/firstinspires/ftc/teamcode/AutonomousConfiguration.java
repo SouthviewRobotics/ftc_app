@@ -18,6 +18,10 @@ public class AutonomousConfiguration {
     public AutonomousConfiguration(Gamepad gamepad, Telemetry telemetry1) {
         this.gamepad1 = gamepad;
         this.telemetry = telemetry1;
+        alliance = AllianceColor.None;
+        startPosition = StartPosition.Center;
+        parkLocation = ParkLocation.Ramp;
+        pressBeacon = PressBeacon.No;
     }
 
     private Telemetry telemetry = null;
@@ -41,13 +45,35 @@ public class AutonomousConfiguration {
         this.alliance = alliance;
     }
 
+    // Where do we place the robot
+    public enum StartPosition {
+        Center,
+        Left,
+        Right
+    }
+
+    // Where do we park
+    public enum ParkLocation {
+        Center,
+        Ramp
+    }
+
+    // Press a beacon button
+    public enum PressBeacon {
+        No,
+        Yes
+    }
+
     public enum AllianceColor {
         None,
         Red,
         Blue
     }
 
-    private AllianceColor alliance = AllianceColor.None;
+    private AllianceColor alliance;
+    private StartPosition startPosition;
+    private ParkLocation parkLocation;
+    private PressBeacon pressBeacon;
 
     public void ShowMenu() {
         while (alliance == AllianceColor.None) {
