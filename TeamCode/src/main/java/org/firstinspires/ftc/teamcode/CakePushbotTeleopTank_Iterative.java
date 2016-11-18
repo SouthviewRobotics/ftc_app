@@ -84,6 +84,8 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         robot.pushLeft.setPosition(-1);
         robot.pushRight.setPosition(1);
         robot.forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Make sure the forklift is retracted.
         RetractForkLift();
         // Send telemetry message to signify robot waiting;
