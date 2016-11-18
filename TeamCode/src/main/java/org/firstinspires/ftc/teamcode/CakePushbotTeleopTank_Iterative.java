@@ -34,61 +34,68 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This file provides basic Telop driving for a Pushbot robot.
  * The code is structured as an Iterative OpMode
  * <p>
- * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
- * All device access is managed through the HardwarePushbot class.
+ * This OpMode uses the CakeHardwarePushbot class to define the devices on the robot.
+ * All device access is managed through the CakeHardwarePushbot class.
  * <p>
  * This particular OpMode executes a basic Tank Drive Teleop for a PushBot
- * It raises and lowers the claw using the Gampad Y and A buttons respectively.
- * It also opens and closes the claws slowly using the left and right Bumper buttons.
+ * It raises and lowers the Winch using the Dpad up and Dpad down respectively.
+ * It also extends and retracts the forklift extenders using the left and right Bumper buttons.
  * <p>
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "Pushbot: Cake Tank", group = "Pushbot")
+@TeleOp(name = "Cake Tank", group = "TeleOp")
 //@Disabled
 public class CakePushbotTeleopTank_Iterative extends OpMode {
 
     /* Declare OpMode members. */
-    CakeHardwarePushbot robot = new CakeHardwarePushbot(); // use the class created to define a Pushbot's hardware
-    // could also use HardwarePushbotMatrix class.
-    double clawOffset = 0.0;                  // Servo mid position
-    final double CLAW_SPEED = 0.02;// sets rate to move servo
-    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
+    private CakeHardwarePushbot robot = new CakeHardwarePushbot(); // use the class created to define a Pushbot's hardware
+    private static final int COUNTS_PER_MOTOR_REV = 1120;    // eg: AndyMark Motor Encoder
+  //  private static int liftAngle = 180;
     private ElapsedTime runtime = new ElapsedTime();
-    static final double FORWARD_SPEED = 0.6;
-    static final double MAX_POS = 1.0;     // Maximum rotational position
-    static final double MIN_POS = 0.0;     // Minimum rotational position
-    double position = (MAX_POS - MIN_POS) / 2;
+    private int forkRaiseDistance = 640;
 
+    // Valid states for the forklift.
+    private enum ForkState {
+        extended,
+        retracted,
+        moving
+    }
+
+    // Assume we start retracted.
+    private ForkState forkState = ForkState.retracted;
 
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap); //Maps hardware
-        robot.pushLeft.setPosition(1);
+        robot.pushLeft.setPosition(-1);
         robot.pushRight.setPosition(1);
-
+        robot.forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // Make sure the forklift is retracted.
+        RetractForkLift();
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
         updateTelemetry(telemetry);
     }
 
     /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
+      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+      */
     @Override
     public void init_loop() {
     }
@@ -106,52 +113,99 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
     @Override
 
     public void loop() {
-        double leftDriveMotorPower; //defines variable
-        double rightDriveMotorPower;
-
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        // robot.leftMotor.setPower(1);
-        leftDriveMotorPower = -gamepad1.left_stick_y;
-        rightDriveMotorPower = -gamepad1.right_stick_y; //Have to offset the negatives
+        double leftDriveMotorPower = -gamepad1.left_stick_y;
+        double rightDriveMotorPower = -gamepad1.right_stick_y;
         robot.leftMotor.setPower(leftDriveMotorPower); //Makes the robot run
         robot.rightMotor.setPower(rightDriveMotorPower);
-        // Left bumper
-        //robot.forkRaise.setPower(FORWARD_SPEED);
-        //while (gamepad1.left_bumper && (runtime.seconds() < 3.0))
-        // {
-        telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
-        telemetry.update();
-        //}
+        /*
+           The following code could be used to test the servos, if needed,
+           otherwise keep it as a comment.
+        */
 
+//        if (gamepad1.a) {
+//            robot.pushRight.setPosition(1);
+//        }
+//        if (gamepad1.b) {
+//            robot.pushLeft.setPosition(-1);
+//        }
 
-        if (gamepad1.left_bumper) {
-            robot.forkRight.setPower(.5);//Forklift in
-            robot.forkLeft.setPower(.5);//Forklift out
+        /*
+        Forklift operation rules:
+            Initially positioned to retracted by init()
+            Can only be extended if already retracted
+            Can only be retracted if already extended
+            Can only be raised or lowered if extended
+         */
+
+        // Extend forklift (no encoders on these motors, user time)
+        if (gamepad2.left_bumper && ForkState.retracted == forkState) {
+            robot.forkRight.setPower(.5);   //Forklift out
+            robot.forkLeft.setPower(.5);    //Forklift out
             runtime.reset();
-            while (runtime.seconds() < 2.0) {
-                telemetry.addData("%2.5f S Elapsed", runtime.seconds());
-                telemetry.update();
-            }
-            robot.forkRight.setPower(0);
-            robot.forkLeft.setPower(0);//Stop Motor
+            forkState = ForkState.moving;
         }
-        // Right Bumper
-       // if (gamepad1.right_bumper) {
-            //robot.forkRaise.setTargetPosition(1440); //Raises forklift
-       // }
+
+        // Retract forklift (no encoders on these motors, user time)
+        if (gamepad2.right_bumper && ForkState.extended == forkState) {
+            robot.forkRight.setPower(-.5);  //Forklift in
+            robot.forkLeft.setPower(-.5);   //Forklift in
+            runtime.reset();
+            forkState = ForkState.moving;
+        }
+
+        // Stop forklifts when time has been reached
+        double SECONDS_TO_EXTEND = 4;
+        if (ForkState.moving == forkState && runtime.seconds() >= SECONDS_TO_EXTEND) {
+            if (robot.forkLeft.getPower() >= 0) {
+                forkState = ForkState.extended;
+            } else {
+                forkState = ForkState.retracted;
+            }
+            //Stop motors
+            robot.forkRight.setPower(0);
+            robot.forkLeft.setPower(0);
+        }
+
+        if (forkState == ForkState.extended) {
+            //Raises forklift using encoders
+            if (gamepad2.dpad_up) {
+                robot.forkRaise.setTargetPosition(forkRaiseDistance);
+                robot.forkRaise.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.forkRaise.setPower(.5);
+            }
+
+            if (gamepad2.dpad_down) {
+                robot.forkRaise.setTargetPosition(0);
+                robot.forkRaise.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.forkRaise.setPower(.5);
+            }
+        }
+
+        telemetry.addData("ForkState", "%s", forkState);
+        telemetry.addData("Raise (target, current)", "%d %d", robot.forkRaise.getTargetPosition(), robot.forkRaise.getCurrentPosition());
+        telemetry.addData("left drive motor power: ", "%.2f", leftDriveMotorPower);
+        telemetry.addData("right drive motor power: ", "%.2f", rightDriveMotorPower);
     }
-    // Send telemetry message to signify robot running;
-    //       telemetry.addData("claw",  "Offset = %.2f", clawOffset);
-    // telemetry.addData("left drive motor power: ", "%.2f", leftDriveMotorPower);
-    // telemetry.addData("right drive motor power: ", "%.2f", rightDriveMotorPower);
-    //updateTelemetry(telemetry);
-    // }
+
+    // Use this at init to make sure the forklift is retracted. Uses the touch sensor.
+    public void RetractForkLift() {
+        telemetry.addData("Touch", "%s pressed = %s", robot.forkStop.getDeviceName(), robot.forkStop.isPressed());
+        runtime.reset();
+        while (!robot.forkStop.isPressed() && runtime.seconds() <= 5) {
+            robot.forkLeft.setPower(-.1);
+            robot.forkRight.setPower(-.1);
+        }
+
+        robot.forkLeft.setPower(0);
+        robot.forkRight.setPower(0);
+    }
 
     /*
      * Code to run ONCE after the driver hits STOP
      */
     @Override
     public void stop() {
-    }
 
+    }
 }

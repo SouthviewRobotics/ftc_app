@@ -32,13 +32,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This file illustrates the concept of driving a path based on Gyro heading and encoder counts.
@@ -69,7 +66,6 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * This is consistent with the FTC field coordinate conventions set out in the document:
  * ftc_app\doc\tutorial\FTC_FieldCoordinateSystemDefinition.pdf
  * <p>
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
@@ -169,7 +165,7 @@ public class CakePushbotAutoDriveByGyro_Linear extends LinearOpMode {
      */
     public void gyroDrive(double speed,
                           double distance,
-                          double angle) throws InterruptedException {
+                          double angle) {
 
         int newLeftTarget;
         int newRightTarget;
@@ -257,10 +253,8 @@ public class CakePushbotAutoDriveByGyro_Linear extends LinearOpMode {
      * @param angle Absolute Angle (in Degrees) relative to last gyro reset.
      *              0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
      *              If a relative angle is required, add/subtract from current heading.
-     * @throws InterruptedException
      */
-    public void gyroTurn(double speed, double angle)
-            throws InterruptedException {
+    public void gyroTurn(double speed, double angle) {
 
         // keep looping while we are still active, and not on heading.
         while (opModeIsActive() && !onHeading(speed, angle, P_TURN_COEFF)) {
@@ -279,10 +273,8 @@ public class CakePushbotAutoDriveByGyro_Linear extends LinearOpMode {
      *                 0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
      *                 If a relative angle is required, add/subtract from current heading.
      * @param holdTime Length of time (in seconds) to hold the specified heading.
-     * @throws InterruptedException
      */
-    public void gyroHold(double speed, double angle, double holdTime)
-            throws InterruptedException {
+    public void gyroHold(double speed, double angle, double holdTime) {
 
         ElapsedTime holdTimer = new ElapsedTime();
 

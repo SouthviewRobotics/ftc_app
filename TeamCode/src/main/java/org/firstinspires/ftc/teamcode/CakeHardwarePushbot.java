@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
 
  */
-public class CakeHardwarePushbot
+class CakeHardwarePushbot
 {
     /* Public OpMode members. */
     public DcMotor  leftMotor   = null;
@@ -28,9 +28,10 @@ public class CakeHardwarePushbot
     public Servo    pushRight    = null;
     public Servo    pushLeft   = null;
     public DcMotor  forkRaise = null;
+    public TouchSensor forkStop = null;
 
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
+    private HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
     /* Constructor */
@@ -51,6 +52,7 @@ public class CakeHardwarePushbot
         forkRight = hwMap.dcMotor.get("forklift right");
         forkLeft = hwMap.dcMotor.get("forklift left");
         forkRaise = hwMap.dcMotor.get("fork raise");
+        forkStop = hwMap.touchSensor.get("fork stop");
 
         //armMotor    = hwMap.dcMotor.get("left_arm");
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
@@ -65,25 +67,23 @@ public class CakeHardwarePushbot
         forkRight.setPower(0);
         forkRaise.setPower(0);
         //armMotor.setPower(0);
-
         forkRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         forkLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         forkRaise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        // Set senors
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         forkLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         forkRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        /*armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        //TODO Move the servo initialize from the TeleOp to here.
         // Define and initialize ALL installed servos.
-        leftClaw = hwMap.servo.get("left_hand");
-        rightClaw = hwMap.servo.get("right_hand");
-        leftClaw.setPosition(MID_SERVO);
-        rightClaw.setPosition(MID_SERVO);*/
     }
 
     /***
