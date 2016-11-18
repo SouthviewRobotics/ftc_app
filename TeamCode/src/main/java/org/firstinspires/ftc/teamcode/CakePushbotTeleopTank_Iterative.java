@@ -58,9 +58,9 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
     /* Declare OpMode members. */
     private CakeHardwarePushbot robot = new CakeHardwarePushbot(); // use the class created to define a Pushbot's hardware
     private static final int COUNTS_PER_MOTOR_REV = 1120;    // eg: AndyMark Motor Encoder
-    private static int liftAngle = 180;
+  //  private static int liftAngle = 180;
     private ElapsedTime runtime = new ElapsedTime();
-    private int forkRaiseDistance = COUNTS_PER_MOTOR_REV / (360 / liftAngle);
+    private int forkRaiseDistance = 640;
 
     // Valid states for the forklift.
     private enum ForkState {
@@ -139,7 +139,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
          */
 
         // Extend forklift (no encoders on these motors, user time)
-        if (gamepad1.left_bumper && ForkState.retracted == forkState) {
+        if (gamepad2.left_bumper && ForkState.retracted == forkState) {
             robot.forkRight.setPower(.5);   //Forklift out
             robot.forkLeft.setPower(.5);    //Forklift out
             runtime.reset();
@@ -147,7 +147,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         }
 
         // Retract forklift (no encoders on these motors, user time)
-        if (gamepad1.right_bumper && ForkState.extended == forkState) {
+        if (gamepad2.right_bumper && ForkState.extended == forkState) {
             robot.forkRight.setPower(-.5);  //Forklift in
             robot.forkLeft.setPower(-.5);   //Forklift in
             runtime.reset();
@@ -169,13 +169,13 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
 
         if (forkState == ForkState.extended) {
             //Raises forklift using encoders
-            if (gamepad1.dpad_up) {
+            if (gamepad2.dpad_up) {
                 robot.forkRaise.setTargetPosition(forkRaiseDistance);
                 robot.forkRaise.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.forkRaise.setPower(.5);
             }
 
-            if (gamepad1.dpad_down) {
+            if (gamepad2.dpad_down) {
                 robot.forkRaise.setTargetPosition(0);
                 robot.forkRaise.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.forkRaise.setPower(.5);

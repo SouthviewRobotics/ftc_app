@@ -64,7 +64,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     /* Declare OpMode members. */
     private CakeHardwarePushbot robot = new CakeHardwarePushbot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
-    private AutonomousConfiguration autoConfig = new AutonomousConfiguration(gamepad1, telemetry);
+    private AutonomousConfiguration autoConfig;
     private AutonomousConfiguration.AllianceColor alliance = AutonomousConfiguration.AllianceColor.None;
     private int startDelay = 0;
 
@@ -96,6 +96,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Get configuration selections from the driver.
+        autoConfig = new AutonomousConfiguration(gamepad1, telemetry);
         autoConfig.ShowMenu();
         this.alliance = autoConfig.getAlliance();
         this.startDelay = autoConfig.getStartDelay();
@@ -115,7 +116,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
+        encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
         encoderDrive(TURN_SPEED, 10, -10, 5.0);
         encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
         encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
@@ -145,7 +146,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             newRightTarget = robot.rightMotor.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
             newLeftTarget = robot.leftMotor.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
             // Assume parameters are for Blue alliance
-            if (this.alliance == AutonomousConfiguration.AllianceColor.Red && (leftInches != rightInches)) {
+            if ((this.alliance == AutonomousConfiguration.AllianceColor.Red) && (leftInches != rightInches)) {
                 newLeftTarget = -newLeftTarget;
                 newRightTarget = -newRightTarget;
             }

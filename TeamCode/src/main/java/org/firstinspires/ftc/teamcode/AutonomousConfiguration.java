@@ -50,7 +50,7 @@ public class AutonomousConfiguration {
     private AllianceColor alliance = AllianceColor.None;
 
     public void ShowMenu() {
-        while (!gamepad1.start && (alliance == AllianceColor.None)) {
+        while (alliance == AllianceColor.None) {
             if (gamepad1.x) {
                 alliance = AllianceColor.Blue;
             }
@@ -71,6 +71,9 @@ public class AutonomousConfiguration {
             telemetry.addData("Finished", "Press gamepad Start");
             telemetry.addData("Selected", "Alliance %s Delay %d", alliance, startDelay);
             telemetry.update();
+            if (gamepad1.start) {
+                break;
+            }
         }
     }
 }
