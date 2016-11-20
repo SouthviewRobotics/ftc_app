@@ -164,14 +164,14 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
+            // Assume parameters are for Blue alliance
+            if ((this.alliance == AutonomousConfiguration.AllianceColor.Red) && (leftInches != rightInches)) {
+                leftInches = leftInches * -1;
+                rightInches = rightInches * -1;
+            }
             // Determine new target position, and pass to motor controller
             newRightTarget = robot.rightMotor.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
             newLeftTarget = robot.leftMotor.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
-            // Assume parameters are for Blue alliance
-            if ((this.alliance == AutonomousConfiguration.AllianceColor.Red) && (leftInches != rightInches)) {
-                newLeftTarget = -newLeftTarget;
-                newRightTarget = -newRightTarget;
-            }
 
             robot.leftMotor.setTargetPosition(newLeftTarget);
             robot.rightMotor.setTargetPosition(newRightTarget);

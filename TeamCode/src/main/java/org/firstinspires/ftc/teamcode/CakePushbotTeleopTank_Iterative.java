@@ -58,9 +58,10 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
     /* Declare OpMode members. */
     private CakeHardwarePushbot robot = new CakeHardwarePushbot(); // use the class created to define a Pushbot's hardware
     private static final int COUNTS_PER_MOTOR_REV = 1120;    // eg: AndyMark Motor Encoder
-  //  private static int liftAngle = 180;
+    //  private static int liftAngle = 180;
     private ElapsedTime runtime = new ElapsedTime();
     private int forkRaiseDistance = 640;
+    private boolean forkRaised = false;
 
     // Valid states for the forklift.
     private enum ForkState {
@@ -136,6 +137,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
             Can only be extended if already retracted
             Can only be retracted if already extended
             Can only be raised or lowered if extended
+            Cannot be retracted if extended
          */
 
         // Extend forklift (no encoders on these motors, user time)
@@ -147,7 +149,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         }
 
         // Retract forklift (no encoders on these motors, user time)
-        if (gamepad2.right_bumper && ForkState.extended == forkState) {
+        if (gamepad2.right_bumper && ForkState.extended == forkState && !forkRaised) {
             robot.forkRight.setPower(-.5);  //Forklift in
             robot.forkLeft.setPower(-.5);   //Forklift in
             runtime.reset();
@@ -173,12 +175,14 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
                 robot.forkRaise.setTargetPosition(forkRaiseDistance);
                 robot.forkRaise.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.forkRaise.setPower(.5);
+                forkRaised = true;
             }
 
             if (gamepad2.dpad_down) {
                 robot.forkRaise.setTargetPosition(0);
                 robot.forkRaise.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.forkRaise.setPower(.5);
+                forkRaised = false;
             }
         }
 

@@ -95,23 +95,31 @@ public class AutonomousConfiguration {
             }
 
             if (gamepad1.dpad_left) {
-                startDelay = startDelay > 0 ? startDelay-- : startDelay;
+                if (startDelay > 0) {
+                    startDelay--;
+                }
             }
 
             if (gamepad1.dpad_right) {
-                startDelay = startDelay < 20 ? startDelay++ : startDelay;
+                if (startDelay < 20) {
+                    startDelay++;
+                }
             }
 
             if (gamepad1.y) {
                 startPosition = startPosition.getNext();
             }
 
+            if (gamepad1.start && alliance != AllianceColor.None) {
+                break;
+            }
+
             telemetry.addData("Menu", "x for Blue, b for Red, dpad left or right for delay");
             telemetry.addData("", "y to cycle start position");
             telemetry.addData("Finished", "Press gamepad Start");
             telemetry.addData("Selected", "Alliance %s Delay %d", alliance, startDelay);
-            telemetry.addData("","Start position %s", startPosition);
+            telemetry.addData("", "Start position %s", startPosition);
             telemetry.update();
-        } while (!gamepad1.start && alliance == AllianceColor.None);
+        } while (true);
     }
 }
