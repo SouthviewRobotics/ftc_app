@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
  * Created by Ron on 10/31/2016.
  * Collection of functions for use in any opmode.
  */
-class UtilityFunctions {
+public class UtilityFunctions {
     public UtilityFunctions() {
     }
 
@@ -14,38 +14,38 @@ class UtilityFunctions {
      * Scale a joystick value to smooth it for motor setting.
      * The cube results in finer control at slow speeds.
      */
-    public float ScaleMotorCube(float joyStickPosition) {
-        return (float) Math.pow(joyStickPosition, 3.0);
+    public static double ScaleMotorCube(double joyStickPosition) {
+        return (double) Math.pow(joyStickPosition, 3.0);
     }
 
     /**
     * Scale the joystick value to smooth it for motor settings.
      * This algorithm gives a bit more sensitivity than the ScaleMotorCube() method.
     * */
-    public float ScaleMotorTan(float joyStickPosition) {
-        return (float) ((joyStickPosition / 1.07) * (.62 * (joyStickPosition * joyStickPosition)) + .45);
+    public static double ScaleMotorTan(double joyStickPosition) {
+        return (double) ((joyStickPosition / 1.07) * (.62 * (joyStickPosition * joyStickPosition)) + .45);
     }
 
     /**
      * Scale the joystick input using a nonlinear algorithm.
      * Tweak the array to get the curve you need.
      */
-    public float ScaleMotorLookTable(float joyStickPosition) {
+    public double ScaleMotorLookTable(double joyStickPosition) {
         //
         // Assume no scaling.
         //
-        float lScale;
+        double lScale;
 
         //
         // Ensure the values are legal.
         //
-        float lPower = Range.clip(joyStickPosition, -1, 1);
+        double lPower = Range.clip(joyStickPosition, -1, 1);
 
-        float[] lArray =
-                {0.00f, 0.05f, 0.09f, 0.10f, 0.12f
-                        , 0.15f, 0.18f, 0.24f, 0.30f, 0.36f
-                        , 0.43f, 0.50f, 0.60f, 0.72f, 0.85f
-                        , 1.00f, 1.00f
+        double[] lArray =
+                {0.00d, 0.05d, 0.09d, 0.10d, 0.12d
+                        , 0.15d, 0.18d, 0.24d, 0.30d, 0.36d
+                        , 0.43d, 0.50d, 0.60d, 0.72d, 0.85d
+                        , 1.00d, 1.00d
                 };
 
         //
