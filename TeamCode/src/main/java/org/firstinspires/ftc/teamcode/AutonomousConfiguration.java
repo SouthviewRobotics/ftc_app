@@ -94,16 +94,12 @@ public class AutonomousConfiguration {
                 alliance = AllianceColor.Red;
             }
 
-            if (gamepad1.dpad_left) {
-                if (startDelay > 0) {
-                    startDelay--;
-                }
+            if (gamepad1.dpad_left && startDelay > 0) {
+                startDelay--;
             }
 
-            if (gamepad1.dpad_right) {
-                if (startDelay < 20) {
-                    startDelay++;
-                }
+            if (gamepad1.dpad_right && startDelay < 20) {
+                startDelay++;
             }
 
             if (gamepad1.y) {
@@ -120,6 +116,17 @@ public class AutonomousConfiguration {
             telemetry.addData("Selected", "Alliance %s Delay %d", alliance, startDelay);
             telemetry.addData("", "Start position %s", startPosition);
             telemetry.update();
+            // Slow down so the delay incrementing works better
+            sleep(500);
         } while (true);
+    }
+
+    private void sleep(long milliseconds)
+    {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
