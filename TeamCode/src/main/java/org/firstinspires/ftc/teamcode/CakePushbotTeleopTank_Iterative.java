@@ -117,13 +117,17 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
         double leftDriveMotorPower = -gamepad1.left_stick_y;
         double rightDriveMotorPower = -gamepad1.right_stick_y;
-        robot.leftMotor.setPower(leftDriveMotorPower); //Makes the robot run
-        robot.rightMotor.setPower(rightDriveMotorPower);
+        // Use a smooth start algorithm
+        robot.leftMotor.setPower(UtilityFunctions.ScaleMotorCube(leftDriveMotorPower)); //Makes the robot run
+        robot.rightMotor.setPower(UtilityFunctions.ScaleMotorCube(rightDriveMotorPower));
+        // Use linear start
+//        robot.leftMotor.setPower(leftDriveMotorPower); //Makes the robot run
+//        robot.rightMotor.setPower(rightDriveMotorPower);
+
         /*
            The following code could be used to test the servos, if needed,
            otherwise keep it as a comment.
         */
-
 //        if (gamepad1.a) {
 //            robot.pushRight.setPosition(1);
 //        }
