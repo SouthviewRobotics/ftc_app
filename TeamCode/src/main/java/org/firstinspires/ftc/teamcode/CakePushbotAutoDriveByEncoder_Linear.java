@@ -64,8 +64,9 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     /* Declare OpMode members. */
     private CakeHardwarePushbot robot = new CakeHardwarePushbot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
-    private AutonomousConfiguration autoConfig;
     private AutonomousConfiguration.AllianceColor alliance = AutonomousConfiguration.AllianceColor.None;
+    // The properties are available after the call to the ShowMenu method of the AutonomousConfiguration class.
+    private AutonomousConfiguration autoConfig;
     private AutonomousConfiguration.StartPosition startPosition;
     private AutonomousConfiguration.ParkLocation parkLocation;
     private AutonomousConfiguration.PressBeacon pressBeacon;
@@ -88,7 +89,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Resetting Encoders");    //
+        telemetry.addData("Status", "Resetting Encoders");
         telemetry.update();
 
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -101,7 +102,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Get configuration selections from the driver.
         autoConfig = new AutonomousConfiguration(gamepad1, telemetry);
         autoConfig.ShowMenu();
-        // Alliance adjustment is in the encoderDrive() method.
+        // Alliance adjustment is made in the encoderDrive() method.
         this.alliance = autoConfig.getAlliance();
         this.startDelay = autoConfig.getStartDelay();
         this.startPosition = autoConfig.getStartPosition();
