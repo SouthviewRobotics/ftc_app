@@ -124,19 +124,10 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
                 robot.leftMotor.getCurrentPosition(),
                 robot.rightMotor.getCurrentPosition());
         telemetry.update();
-
-        // Run the selected path
+        // Run the selected path.
         runPath();
 
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
-    }
-
-    /*
-     *  Run the path driven by the driver configuration selections.
-     *  startPosition, parkLocation and pressButton.
-     */
-    private void runPath() {
+/*
         // Start Center - Park Ramp
         if (this.startPosition == AutonomousConfiguration.StartPosition.Center &&
                 this.parkLocation == AutonomousConfiguration.ParkLocation.Ramp) {
@@ -153,6 +144,59 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
             encoderDrive(TURN_SPEED, 10, -10, 5.0);
             encoderDrive(DRIVE_SPEED, 24, 24, 5.0);
+            encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
+            encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
+        }
+*/
+
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+    }
+
+    /*
+     *  Run the path driven by the driver configuration selections.
+     *  startPosition, parkLocation and pressButton.
+     */
+    private void runPath() {
+        // First segments: Start center
+        if (this.startPosition == AutonomousConfiguration.StartPosition.Center) {
+            encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
+            encoderDrive(TURN_SPEED, 10, -10, 5.0);
+        } else {        // Start left
+            encoderDrive(DRIVE_SPEED, 30, 30, 5.0);
+            encoderDrive(TURN_SPEED, 5, -5, 5.0);
+            encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
+            encoderDrive(TURN_SPEED, 5, -5, 5.0);
+        }
+
+        // Try to press beacons.
+        //TODO This needs testing, sensors and refinement.
+        if (this.pressBeacon) {
+            encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
+            encoderDrive(TURN_SPEED, -2.5, 2.5, 5.0);
+            //TODO Need to look for white line here.
+            encoderDrive(TURN_SPEED, 2.5, -2.5, 5.0);
+            // Pressing here.
+            encoderDrive(DRIVE_SPEED, 5, 5, 5.0);
+            //TODO Add color detect logic
+            encoderDrive(DRIVE_SPEED, -5, -5, 5.0);
+            encoderDrive(TURN_SPEED, -10, 10, 5.0);
+            encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
+            encoderDrive(TURN_SPEED, -2.5, 2.5, 5.0);
+            //TODO Need to look for white line here.
+            encoderDrive(TURN_SPEED, 2.5, -2.5, 5.0);
+            // Pressing here.
+            encoderDrive(DRIVE_SPEED, 5, 5, 5.0);
+            //TODO Add color detect logic
+            encoderDrive(DRIVE_SPEED, -5, -5, 5.0);
+            // Assume ramp park
+            encoderDrive(TURN_SPEED, 10, -10, 5.0);
+            encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
+            return;
+        }
+
+        // Park location:  Ramp
+        if (this.parkLocation == AutonomousConfiguration.ParkLocation.Ramp) {
             encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
             encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
         }
@@ -175,6 +219,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
             // Assume parameters are for Blue alliance
+            // Different leftInches and rightInches means we are turning.
             if ((this.alliance == AutonomousConfiguration.AllianceColor.Red) && (leftInches != rightInches)) {
                 leftInches = leftInches * -1;
                 rightInches = rightInches * -1;
@@ -213,4 +258,5 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             sleep(250);   // optional pause after each move
         }
     }
+
 }
