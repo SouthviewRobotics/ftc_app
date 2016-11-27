@@ -64,12 +64,12 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     /* Declare OpMode members. */
     private CakeHardwarePushbot robot = new CakeHardwarePushbot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
-    private AutonomousConfiguration.AllianceColor alliance = AutonomousConfiguration.AllianceColor.None;
     // The properties are available after the call to the ShowMenu method of the AutonomousConfiguration class.
     private AutonomousConfiguration autoConfig;
+    private AutonomousConfiguration.AllianceColor alliance = AutonomousConfiguration.AllianceColor.None;
     private AutonomousConfiguration.StartPosition startPosition;
     private AutonomousConfiguration.ParkLocation parkLocation;
-    private AutonomousConfiguration.PressBeacon pressBeacon;
+    private boolean pressBeacon;
     private int startDelay = 0;
 
     static final double COUNTS_PER_MOTOR_REV = 1120;    // AndyMark Motor Encoder
@@ -125,6 +125,18 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
                 robot.rightMotor.getCurrentPosition());
         telemetry.update();
 
+        // Run the selected path
+        runPath();
+
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+    }
+
+    /*
+     *  Run the path driven by the driver configuration selections.
+     *  startPosition, parkLocation and pressButton.
+     */
+    private void runPath() {
         // Start Center - Park Ramp
         if (this.startPosition == AutonomousConfiguration.StartPosition.Center &&
                 this.parkLocation == AutonomousConfiguration.ParkLocation.Ramp) {
@@ -144,9 +156,6 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
             encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
         }
-
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
     }
 
     /*

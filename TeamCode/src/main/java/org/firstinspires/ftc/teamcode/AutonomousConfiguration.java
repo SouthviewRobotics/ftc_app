@@ -8,10 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
  * Created by Ron on 11/16/2016.
- * This class provides a way to configure you autonomous opmode.
- * Current version allows selecting:
- * - Alliance
- * - Start Delay
+ * This class provides configuration for the autonomous opmode.
  */
 
 public class AutonomousConfiguration {
@@ -22,13 +19,44 @@ public class AutonomousConfiguration {
         // Default selections if driver does not select any.
         startPosition = StartPosition.Center;
         parkLocation = ParkLocation.Ramp;
-        pressBeacon = PressBeacon.No;
+        pressBeacon = false;
+    }
+
+    private AllianceColor alliance;
+    private StartPosition startPosition;
+    private ParkLocation parkLocation;
+    private boolean pressBeacon;
+    private Gamepad gamepad1 = null;
+
+    // Seconds to delay before starting opmode.
+    private int startDelay = 0;
+
+    // Where do we place the robot
+    public enum StartPosition {
+        Center,
+        Left;
+        public StartPosition getNext() {
+            return values()[(ordinal() + 1) % values().length];
+        }
+
+    }
+
+    // Where do we park
+    public enum ParkLocation {
+        Center,
+        Ramp;
+        public ParkLocation getNext() {
+            return values()[(ordinal() + 1) % values().length];
+        }
+    }
+
+    public enum AllianceColor {
+        None,
+        Red,
+        Blue
     }
 
     private Telemetry telemetry = null;
-    private Gamepad gamepad1 = null;
-    // Seconds to delay before starting opmode.
-    private int startDelay = 0;
 
     public int getStartDelay() {
         return startDelay;
@@ -46,42 +74,9 @@ public class AutonomousConfiguration {
         return parkLocation;
     }
 
-    public PressBeacon getPressBeacon() {
+    public boolean getPressBeacon() {
         return pressBeacon;
     }
-
-    // Where do we place the robot
-    public enum StartPosition {
-        Center,
-        Left;
-
-        public StartPosition getNext() {
-            return values()[(ordinal() + 1) % values().length];
-        }
-    }
-
-    // Where do we park
-    public enum ParkLocation {
-        Center,
-        Ramp
-    }
-
-    // Press a beacon button
-    public enum PressBeacon {
-        No,
-        Yes
-    }
-
-    public enum AllianceColor {
-        None,
-        Red,
-        Blue
-    }
-
-    private AllianceColor alliance;
-    private StartPosition startPosition;
-    private ParkLocation parkLocation;
-    private PressBeacon pressBeacon;
 
     public void ShowMenu() {
         //
@@ -106,23 +101,37 @@ public class AutonomousConfiguration {
                 startPosition = startPosition.getNext();
             }
 
+            if (gamepad1.a) {
+                parkLocation = parkLocation.getNext();
+            }
+
+            if (gamepad1.right_bumper) {
+                pressBeacon = !pressBeacon;
+            }
+
+            // Only allow loop exit if alliance has been selected.
             if (gamepad1.start && alliance != AllianceColor.None) {
                 break;
             }
 
-            telemetry.addData("Menu", "x for Blue, b for Red, dpad left or right for delay");
+            telemetry.addData("Menu", "x = Blue, b = Red,");
+            telemetry.addData("", "dpad left(decrease), right(increase) start delay");
             telemetry.addData("", "y to cycle start position");
+            telemetry.addData("", "a to cycle park location");
+            telemetry.addData("", "right bumper to cycle press beacon");
             telemetry.addData("Finished", "Press gamepad Start");
-            telemetry.addData("Selected", "Alliance %s Delay %d", alliance, startDelay);
+            telemetry.addData("Selected", "Alliance %s", alliance);
+            telemetry.addData("", "Start delay %d", startDelay);
             telemetry.addData("", "Start position %s", startPosition);
+            telemetry.addData("", "Park location %s", parkLocation);
+            telemetry.addData("", "Press the beacon %s", pressBeacon);
             telemetry.update();
             // Slow down so the delay incrementing works better
-            sleep(500);
+            sleep(250);
         } while (true);
     }
 
-    private void sleep(long milliseconds)
-    {
+    private void sleep(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
