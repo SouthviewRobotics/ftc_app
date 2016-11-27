@@ -50,7 +50,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * cable for the sensor is connected to an I2C port on the
  * Core Device Interface Module.
  *
- * It also assuems that the LED pin of the sensor is connected
+ * It also assumes that the LED pin of the sensor is connected
  * to the digital signal pin of a digital port on the
  * Core Device Interface Module.
  *
@@ -59,7 +59,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  *
  * The op mode assumes that the Core Device Interface Module
  * is configured with a name of "dim" and that the Adafruit color sensor
- * is configured as an I2C device with a name of "sensor_color".
+ * is configured as an I2C device with a name of "color forward".
  *
  * It also assumes that the LED pin of the RGB sensor
  * is connected to the signal pin of digital port #5 (zero indexed)
@@ -70,8 +70,8 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@Autonomous(name = "AdafruitRGB", group = "Test")
-@Disabled                          // Comment this out to add to the opmode list
+@Autonomous(name = "Sensor: AdafruitRGB", group = "Test")
+//@Disabled                          // Comment this out to add to the opmode list
 public class TestSensorAdafruitRGB extends LinearOpMode {
 
   ColorSensor sensorRGB;
@@ -110,7 +110,7 @@ public class TestSensorAdafruitRGB extends LinearOpMode {
     cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
 
     // get a reference to our ColorSensor object.
-    sensorRGB = hardwareMap.colorSensor.get("sensor_color");
+    sensorRGB = hardwareMap.colorSensor.get("color forward");
 
     // turn the LED on in the beginning, just so user will know that the sensor is active.
     cdim.setDigitalChannelState(LED_CHANNEL, bLedOn);

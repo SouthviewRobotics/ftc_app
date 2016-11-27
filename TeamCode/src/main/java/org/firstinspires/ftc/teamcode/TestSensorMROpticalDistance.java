@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -39,12 +40,12 @@ import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 /*
  * This is an example LinearOpMode that shows how to use
  * a Modern Robotics Optical Distance Sensor
- * It assumes that the ODS sensor is configured with a name of "ods".
+ * It assumes that the ODS sensor is configured with a name of "distance forward".
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name = "Sensor: MR ODS", group = "Sensor")
+@Autonomous(name = "Sensor: MR ODS", group = "Test")
 //@Disabled
 public class TestSensorMROpticalDistance extends LinearOpMode {
 
@@ -54,7 +55,7 @@ public class TestSensorMROpticalDistance extends LinearOpMode {
   public void runOpMode() {
 
     // get a reference to our Light Sensor object.
-    odsSensor = hardwareMap.opticalDistanceSensor.get("ods");
+    odsSensor = hardwareMap.opticalDistanceSensor.get("distance forward");
 
     // wait for the start button to be pressed.
     waitForStart();
