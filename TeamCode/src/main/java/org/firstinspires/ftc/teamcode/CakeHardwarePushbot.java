@@ -73,20 +73,21 @@ class CakeHardwarePushbot {
         forkLeft.setPower(0);
         forkRight.setPower(0);
         forkRaise.setPower(0);
+
+        // Stop and reset encoders in all motors.
         forkRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         forkLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         forkRaise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Set all motors to run without encoders.
+        // Set motors to required encoder mode.
+        // TeleOp will change some of these.
         leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         forkLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         forkRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //TODO Move the servo initialize from the TeleOp to here.
     }
 
     /***
