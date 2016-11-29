@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -31,6 +32,7 @@ class CakeHardwarePushbot {
     public TouchSensor forkStop = null;
     public DeviceInterfaceModule deviceInterfaceModule = null;
     public ColorSensor colorForward = null;
+    public ColorSensor colorDown = null;
     public OpticalDistanceSensor distanceForward = null;
 
     /* local OpMode members. */
@@ -61,7 +63,11 @@ class CakeHardwarePushbot {
         distanceForward = hwMap.opticalDistanceSensor.get("distance forward");
         deviceInterfaceModule = hwMap.deviceInterfaceModule.get("dim");
         colorForward = hwMap.colorSensor.get("color forward");
+        colorDown = hwMap.colorSensor.get("color down");
+        // Color sensors need different addresses.
+        colorDown.setI2cAddress(I2cAddr.create7bit(0x26));
 
+        // Set motor direction to reflect mounting positions.
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
         forkLeft.setDirection(DcMotor.Direction.FORWARD);

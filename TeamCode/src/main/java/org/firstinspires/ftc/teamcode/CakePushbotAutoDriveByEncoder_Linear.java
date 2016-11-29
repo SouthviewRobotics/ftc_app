@@ -72,6 +72,11 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     private boolean pressBeacon;
     private int startDelay = 0;
 
+    // we assume that the LED pin of the RGB sensor is connected to
+    // digital port 5 (zero indexed).
+    static final int FORWARD_LED_CHANNEL = 5;
+    static final int DOWN_LED_CHANNEL = 6;
+
     static final double COUNTS_PER_MOTOR_REV = 1120;    // AndyMark Motor Encoder
     static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
     static final double WHEEL_DIAMETER_INCHES = 3.9;     // For figuring circumference
@@ -108,6 +113,12 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         this.startPosition = autoConfig.getStartPosition();
         this.parkLocation = autoConfig.getParkLocation();
         this.pressBeacon = autoConfig.getPressBeacon();
+        if (pressBeacon) {
+            // turn the forward LED off because we are reading direct light not reflective light.
+            robot.deviceInterfaceModule.setDigitalChannelState(FORWARD_LED_CHANNEL, false);
+            // turn the down LED on because we are reading reflective light not direct light.
+            robot.deviceInterfaceModule.setDigitalChannelState(DOWN_LED_CHANNEL, true);
+        }
 
         telemetry.addData("Alliance/Delay", "%s - %d seconds", this.alliance, this.startDelay);
         telemetry.addData("Start Position", "%s", this.startPosition);
@@ -124,30 +135,9 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
                 robot.leftMotor.getCurrentPosition(),
                 robot.rightMotor.getCurrentPosition());
         telemetry.update();
+
         // Run the selected path.
         runPath();
-
-/*
-        // Start Center - Park Ramp
-        if (this.startPosition == AutonomousConfiguration.StartPosition.Center &&
-                this.parkLocation == AutonomousConfiguration.ParkLocation.Ramp) {
-            encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
-            encoderDrive(TURN_SPEED, 10, -10, 5.0);
-            encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
-            encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
-            encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
-        }
-
-        // Start Left - Park Ramp
-        if (this.startPosition == AutonomousConfiguration.StartPosition.Left &&
-                this.parkLocation == AutonomousConfiguration.ParkLocation.Ramp) {
-            encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
-            encoderDrive(TURN_SPEED, 10, -10, 5.0);
-            encoderDrive(DRIVE_SPEED, 24, 24, 5.0);
-            encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
-            encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
-        }
-*/
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -200,6 +190,74 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
             encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
         }
+    }
+
+    /*
+     *  Follow the white line, stop in lineTimeout seconds, when distance is reached,
+     *  or opticalDistanceValue is reached.
+     */
+    private void followLine(double lineTimeout, double maxInches) {
+        //TODO Determine best values for these constants by testing.
+        final double REACHED_BEACON = 0.2; // Optical distance value at beacon.
+        final double PERFECT_COLOR = 0.2;   // The color value for the edge of the line.
+        double correction;
+        double leftPower;
+        double rightPower;
+        // Save the current motor run modes.
+        DcMotor.RunMode currentLeftMode = robot.leftMotor.getMode();
+        DcMotor.RunMode currentRightMode = robot.rightMotor.getMode();
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        idle();
+
+        while (true) {
+            // Keep us from trying forever.
+            if (runtime.seconds() >= lineTimeout ||
+                    this.reachedBeacon(REACHED_BEACON) ||
+                    robot.leftMotor.getCurrentPosition() >= (int) (maxInches * COUNTS_PER_INCH)) {
+                break;
+            }
+
+            correction = (PERFECT_COLOR - robot.colorDown.argb());
+            if (correction <= 0) {
+                leftPower = .075d - correction;
+                rightPower = .075d;
+            } else {
+                leftPower = .075d;
+                rightPower = .075d + correction;
+            }
+
+            robot.leftMotor.setPower(leftPower);
+            robot.rightMotor.setPower(rightPower);
+        }
+
+        robot.leftMotor.setPower(0);
+        robot.rightMotor.setPower(0);
+        idle();
+        robot.leftMotor.setMode(currentLeftMode);
+        robot.rightMotor.setMode(currentRightMode);
+        idle();
+    }
+
+    /*
+     *  Check the beacon color and return it.
+     */
+    private UtilityFunctions.BeaconColor getBeaconColor() {
+        UtilityFunctions.BeaconColor detectedColor = null;
+        int redValue = robot.colorForward.red();
+        int blueValue = robot.colorForward.blue();
+        //TODO Use test code to see if this is the best way to determine color.
+        return redValue > blueValue ?
+                UtilityFunctions.BeaconColor.Red : UtilityFunctions.BeaconColor.Blue;
+    }
+
+    // Check distance to beacon, return true if we are there.
+    private boolean reachedBeacon(double beaconTarget) {
+        if (robot.distanceForward.getLightDetected() >= beaconTarget) {
+            return true;
+        }
+
+        return false;
     }
 
     /*
@@ -258,5 +316,4 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             sleep(250);   // optional pause after each move
         }
     }
-
 }

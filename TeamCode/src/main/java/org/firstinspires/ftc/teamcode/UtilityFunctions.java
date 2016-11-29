@@ -10,6 +10,12 @@ public class UtilityFunctions {
     public UtilityFunctions() {
     }
 
+    // For convenience when passing beacon colors around.
+    public enum BeaconColor {
+        Red,
+        Blue
+    }
+
     /**
      * Scale a joystick value to smooth it for motor setting.
      * The cube results in finer control at slow speeds.
