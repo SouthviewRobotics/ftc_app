@@ -210,7 +210,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         idle();
 
-        while (true) {
+        while (opModeIsActive()) {
             // Keep us from trying forever.
             if (runtime.seconds() >= lineTimeout ||
                     this.reachedBeacon(REACHED_BEACON) ||
