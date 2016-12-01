@@ -35,6 +35,7 @@ public class AutonomousConfiguration {
     public enum StartPosition {
         Center,
         Left;
+
         public StartPosition getNext() {
             return values()[(ordinal() + 1) % values().length];
         }
@@ -45,6 +46,7 @@ public class AutonomousConfiguration {
     public enum ParkLocation {
         Center,
         Ramp;
+
         public ParkLocation getNext() {
             return values()[(ordinal() + 1) % values().length];
         }
@@ -79,7 +81,11 @@ public class AutonomousConfiguration {
     }
 
     public void ShowMenu() {
-        //
+        boolean bCurrStatePadLeft = false;
+        boolean bPrevStatePadLeft = false;
+        boolean bCurrStatePadRight = false;
+        boolean bPrevStatePadRight = false;
+
         do {
             if (gamepad1.x) {
                 alliance = AllianceColor.Blue;
@@ -89,13 +95,21 @@ public class AutonomousConfiguration {
                 alliance = AllianceColor.Red;
             }
 
-            if (gamepad1.dpad_left && startDelay > 0) {
+            bCurrStatePadLeft = gamepad1.dpad_left;
+            if ((bCurrStatePadLeft && (bCurrStatePadLeft != bPrevStatePadLeft))
+                    && (startDelay > 0)) {
                 startDelay--;
             }
 
-            if (gamepad1.dpad_right && startDelay < 20) {
+            bPrevStatePadLeft = bCurrStatePadLeft;
+
+            bCurrStatePadRight = gamepad1.dpad_right;
+            if ((bCurrStatePadRight && (bCurrStatePadRight != bPrevStatePadRight))
+                    && (startDelay < 20)) {
                 startDelay++;
             }
+
+            bPrevStatePadRight = bCurrStatePadRight;
 
             if (gamepad1.y) {
                 startPosition = startPosition.getNext();
@@ -126,8 +140,6 @@ public class AutonomousConfiguration {
             telemetry.addData("", "Park location %s", parkLocation);
             telemetry.addData("", "Press the beacon %s", pressBeacon);
             telemetry.update();
-            // Slow down so the delay incrementing works better
-            sleep(250);
         } while (true);
     }
 
