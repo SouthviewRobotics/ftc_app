@@ -209,6 +209,8 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         idle();
+        // Start timer for safety timeout.
+        runtime.reset();
 
         while (opModeIsActive()) {
             // Keep us from trying forever.
@@ -243,15 +245,29 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
      *  Check the beacon color and return it.
      */
     private UtilityFunctions.BeaconColor getBeaconColor() {
-        UtilityFunctions.BeaconColor detectedColor = null;
-        int redValue = robot.colorForward.red();
-        int blueValue = robot.colorForward.blue();
         //TODO Use test code to see if this is the best way to determine color.
-        return redValue > blueValue ?
+        UtilityFunctions.BeaconColor detectedColor = null;
+        // Timer to control how long we look at the color.
+        ElapsedTime lookTime = new ElapsedTime();
+        double timeToLook = 500;
+        // Smoothing factor for smoothValue() method.
+        final double factor = .5;
+        int redAverage = robot.colorForward.red();
+        int blueAverage = robot.colorForward.blue();
+
+        while (opModeIsActive() && (lookTime.milliseconds() <= timeToLook)) {
+            redAverage = UtilityFunctions.smoothValue(redAverage, robot.colorForward.red(), factor);
+            blueAverage = UtilityFunctions.smoothValue(blueAverage, robot.colorForward.blue(), factor);
+            idle();
+        }
+
+        return redAverage > blueAverage ?
                 UtilityFunctions.BeaconColor.Red : UtilityFunctions.BeaconColor.Blue;
     }
 
     // Check distance to beacon, return true if we are there.
+    // Assumes optical distance sensor.
+    //TODO: Test - Maybe drive by distance is better?
     private boolean reachedBeacon(double beaconTarget) {
         if (robot.distanceForward.getLightDetected() >= beaconTarget) {
             return true;

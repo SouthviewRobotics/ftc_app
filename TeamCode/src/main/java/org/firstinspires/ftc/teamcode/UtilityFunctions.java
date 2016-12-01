@@ -16,6 +16,17 @@ public class UtilityFunctions {
         Blue
     }
 
+    /*
+     * A moving average function to smooth out sensor values.
+     * currentAverage = moving average from the last calculation
+     * newValue = New sensor value
+     * factor = A factor to control how much the value is smoothed (0 to 1)
+     *              Closer to 1 smooths less, closer to 0 smooths more.
+     */
+    public  static int smoothValue(int currentAverage, int newValue, double factor) {
+        return (int)(((1 - factor) * currentAverage) + (factor * newValue));
+    }
+
     /**
      * Scale a joystick value to smooth it for motor setting.
      * The cube results in finer control at slow speeds.
