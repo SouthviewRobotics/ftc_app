@@ -153,20 +153,25 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     private void runPath() {
         AutonomousConfiguration.AllianceColor detectedColor;
         // First segments: Start center
-        if (this.startPosition == AutonomousConfiguration.StartPosition.Center) {
-            encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
-            encoderDrive(TURN_SPEED, 10, -10, 5.0);
-        } else {        // Start left
-            encoderDrive(DRIVE_SPEED, 30, 30, 5.0);
-            encoderDrive(TURN_SPEED, 5, -5, 5.0);
-            encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
-            encoderDrive(TURN_SPEED, 5, -5, 5.0);
+        if (!this.pressBeacon) {
+            if (this.startPosition == AutonomousConfiguration.StartPosition.Center) {
+                encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
+                encoderDrive(TURN_SPEED, 10, -10, 5.0);
+            } else {        // Start left
+                encoderDrive(DRIVE_SPEED, 30, 30, 5.0);
+                encoderDrive(TURN_SPEED, 5, -5, 5.0);
+                encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
+                encoderDrive(TURN_SPEED, 5, -5, 5.0);
+            }
         }
 
         // Try to press beacons.
         //TODO This needs testing, sensors and refinement.
         if (this.pressBeacon) {
+            encoderDrive(TURN_SPEED, 4, 0, 5.0);
             encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
+            encoderDrive(TURN_SPEED, 4, 0, 5.0);
+
 //            encoderDrive(TURN_ SPEED, -2.5, 2.5, 5.0);
             //TODO Need to look for white line here.
 //            encoderDrive(TURN_SPEED, 2.5, -2.5, 5.0);
