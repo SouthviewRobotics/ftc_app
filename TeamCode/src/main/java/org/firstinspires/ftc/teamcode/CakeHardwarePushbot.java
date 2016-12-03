@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -24,14 +23,15 @@ class CakeHardwarePushbot {
     /* Public OpMode members. */
     public DcMotor leftMotor = null;
     public DcMotor rightMotor = null;
-    public DcMotor forkRight = null;
-    public DcMotor forkLeft = null;
+//    public DcMotor forkRight = null;
+//    public DcMotor forkLeft = null;
     public Servo pushRight = null;
     public Servo pushLeft = null;
-    public DcMotor forkRaise = null;
+//    public DcMotor forkRaise = null;
     public TouchSensor forkStop = null;
     public DeviceInterfaceModule deviceInterfaceModule = null;
-    public ColorSensor colorForward = null;
+    public ColorSensor colorForwardLeft = null;
+    public ColorSensor colorForwardRight = null;
     public ColorSensor colorDown = null;
     public OpticalDistanceSensor distanceForward = null;
 
@@ -54,36 +54,34 @@ class CakeHardwarePushbot {
         rightMotor = hwMap.dcMotor.get("right drive");
         pushLeft = hwMap.servo.get("beacon left");
         pushRight = hwMap.servo.get("beacon right");
-        forkRight = hwMap.dcMotor.get("forklift right");
-        forkLeft = hwMap.dcMotor.get("forklift left");
-        forkRaise = hwMap.dcMotor.get("fork raise");
 
         // Set sensors
         forkStop = hwMap.touchSensor.get("fork stop");
-        distanceForward = hwMap.opticalDistanceSensor.get("distance forward");
+//        distanceForward = hwMap.opticalDistanceSensor.get("distance forward");
         deviceInterfaceModule = hwMap.deviceInterfaceModule.get("dim");
-        colorForward = hwMap.colorSensor.get("color forward");
-        colorDown = hwMap.colorSensor.get("color down");
+        colorForwardLeft = hwMap.colorSensor.get("color forward left");
+        colorForwardRight = hwMap.colorSensor.get("color forward right");
+//        colorDown = hwMap.colorSensor.get("color down");
         // Color sensors need different addresses.
-        colorDown.setI2cAddress(I2cAddr.create7bit(0x26));
+//        colorDown.setI2cAddress(I2cAddr.create7bit(0x26));
 
         // Set motor direction to reflect mounting positions.
-        leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-        forkLeft.setDirection(DcMotor.Direction.FORWARD);
-        forkRight.setDirection(DcMotor.Direction.REVERSE);
-        forkRaise.setDirection(DcMotor.Direction.REVERSE);
+        leftMotor.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+        rightMotor.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
+//        forkLeft.setDirection(DcMotor.Direction.FORWARD);
+//        forkRight.setDirection(DcMotor.Direction.REVERSE);
+//        forkRaise.setDirection(DcMotor.Direction.REVERSE);
         // Set all motors to zero power
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-        forkLeft.setPower(0);
-        forkRight.setPower(0);
-        forkRaise.setPower(0);
+//        forkLeft.setPower(0);
+//        forkRight.setPower(0);
+//        forkRaise.setPower(0);
 
         // Stop and reset encoders in all motors.
-        forkRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        forkLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        forkRaise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        forkRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        forkLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        forkRaise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -91,9 +89,9 @@ class CakeHardwarePushbot {
         // TeleOp will change some of these.
         leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        forkLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        forkRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        forkLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        forkRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     /***

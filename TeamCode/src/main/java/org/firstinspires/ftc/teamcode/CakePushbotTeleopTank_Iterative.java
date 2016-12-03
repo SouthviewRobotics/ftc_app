@@ -84,11 +84,11 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         robot.init(hardwareMap); //Maps hardware
         robot.pushLeft.setPosition(-1);
         robot.pushRight.setPosition(1);
-        robot.forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Make sure the forklift is retracted.
-        RetractForkLift();
+//        RetractForkLift();
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
         updateTelemetry(telemetry);
@@ -145,6 +145,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
          */
 
         // Extend forklift (no encoders on these motors, user time)
+/*
         if (gamepad2.left_bumper && ForkState.retracted == forkState) {
             robot.forkRight.setPower(.5);   //Forklift out
             robot.forkLeft.setPower(.5);    //Forklift out
@@ -159,7 +160,9 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
             runtime.reset();
             forkState = ForkState.moving;
         }
+*/
 
+/*
         // Stop forklifts when time has been reached
         double SECONDS_TO_EXTEND = 4;
         if (ForkState.moving == forkState && runtime.seconds() >= SECONDS_TO_EXTEND) {
@@ -194,9 +197,11 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         telemetry.addData("Raise (target, current)", "%d %d", robot.forkRaise.getTargetPosition(), robot.forkRaise.getCurrentPosition());
         telemetry.addData("left drive motor power: ", "%.2f", leftDriveMotorPower);
         telemetry.addData("right drive motor power: ", "%.2f", rightDriveMotorPower);
+*/
     }
 
     // Use this at init to make sure the forklift is retracted. Uses the touch sensor.
+/*
     public void RetractForkLift() {
         telemetry.addData("Touch", "%s pressed = %s", robot.forkStop.getDeviceName(), robot.forkStop.isPressed());
         runtime.reset();
@@ -208,6 +213,7 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
         robot.forkLeft.setPower(0);
         robot.forkRight.setPower(0);
     }
+*/
 
     /*
      * Code to run ONCE after the driver hits STOP

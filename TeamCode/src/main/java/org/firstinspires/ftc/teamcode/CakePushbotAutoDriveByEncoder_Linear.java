@@ -92,6 +92,9 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+        // Position button presser
+        robot.pushLeft.setPosition(-1);
+        robot.pushRight.setPosition(1);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Resetting Encoders");
@@ -148,6 +151,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
      *  startPosition, parkLocation and pressButton.
      */
     private void runPath() {
+        AutonomousConfiguration.AllianceColor detectedColor;
         // First segments: Start center
         if (this.startPosition == AutonomousConfiguration.StartPosition.Center) {
             encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
@@ -163,12 +167,24 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         //TODO This needs testing, sensors and refinement.
         if (this.pressBeacon) {
             encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
-            encoderDrive(TURN_SPEED, -2.5, 2.5, 5.0);
+//            encoderDrive(TURN_ SPEED, -2.5, 2.5, 5.0);
             //TODO Need to look for white line here.
-            encoderDrive(TURN_SPEED, 2.5, -2.5, 5.0);
+//            encoderDrive(TURN_SPEED, 2.5, -2.5, 5.0);
             // Pressing here.
-            encoderDrive(DRIVE_SPEED, 5, 5, 5.0);
+            encoderDrive(DRIVE_SPEED, 10, 10, 5.0);
             //TODO Add color detect logic
+            detectedColor = getBeaconColor();
+            // Correct color?
+            if (detectedColor != this.alliance) {
+                while (opModeIsActive()) {
+                    if (runtime.seconds() <= 5) {
+                        encoderDrive(DRIVE_SPEED, -2, -2, 5.0);
+                        encoderDrive(DRIVE_SPEED, 2, 2, 5.0);
+                        break;
+                    }
+                }
+            }
+
             encoderDrive(DRIVE_SPEED, -5, -5, 5.0);
             encoderDrive(TURN_SPEED, -10, 10, 5.0);
             encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
@@ -244,25 +260,29 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     /*
      *  Check the beacon color and return it.
      */
-    private UtilityFunctions.BeaconColor getBeaconColor() {
-        //TODO Use test code to see if this is the best way to determine color.
+    private AutonomousConfiguration.AllianceColor getBeaconColor() {
         UtilityFunctions.BeaconColor detectedColor = null;
         // Timer to control how long we look at the color.
         ElapsedTime lookTime = new ElapsedTime();
         double timeToLook = 500;
         // Smoothing factor for smoothValue() method.
         final double factor = .5;
-        int redAverage = robot.colorForward.red();
-        int blueAverage = robot.colorForward.blue();
+        int redAverageLeft = robot.colorForwardLeft.red();
+        int blueAverageLeft = robot.colorForwardLeft.blue();
+        int redAverageRight = robot.colorForwardRight.red();
+        int blueAverageRight = robot.colorForwardRight.blue();
 
         while (opModeIsActive() && (lookTime.milliseconds() <= timeToLook)) {
-            redAverage = UtilityFunctions.smoothValue(redAverage, robot.colorForward.red(), factor);
-            blueAverage = UtilityFunctions.smoothValue(blueAverage, robot.colorForward.blue(), factor);
+            redAverageLeft = UtilityFunctions.smoothValue(redAverageLeft, robot.colorForwardLeft.red(), factor);
+            blueAverageLeft = UtilityFunctions.smoothValue(blueAverageLeft, robot.colorForwardLeft.blue(), factor);
+            redAverageRight = UtilityFunctions.smoothValue(redAverageRight, robot.colorForwardRight.red(), factor);
+            blueAverageRight = UtilityFunctions.smoothValue(blueAverageRight, robot.colorForwardRight.blue(), factor);
             idle();
         }
 
-        return redAverage > blueAverage ?
-                UtilityFunctions.BeaconColor.Red : UtilityFunctions.BeaconColor.Blue;
+        return redAverageLeft + redAverageRight > blueAverageLeft + blueAverageRight
+                ?
+                AutonomousConfiguration.AllianceColor.Red : AutonomousConfiguration.AllianceColor.Blue;
     }
 
     // Check distance to beacon, return true if we are there.
@@ -294,7 +314,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         if (opModeIsActive()) {
             // Assume parameters are for Blue alliance
             // Different leftInches and rightInches means we are turning.
-            if ((this.alliance == AutonomousConfiguration.AllianceColor.Red) && (leftInches != rightInches)) {
+            if ((this.alliance == AutonomousConfiguration.AllianceColor.Blue) && (leftInches != rightInches)) {
                 leftInches = leftInches * -1;
                 rightInches = rightInches * -1;
             }
