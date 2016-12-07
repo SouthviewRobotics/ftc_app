@@ -69,7 +69,9 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
     private AutonomousConfiguration.AllianceColor alliance = AutonomousConfiguration.AllianceColor.None;
     private AutonomousConfiguration.StartPosition startPosition;
     private AutonomousConfiguration.ParkLocation parkLocation;
+    private AutonomousConfiguration.AllianceColor detectedColor;
     private boolean pressBeacon;
+    private boolean launchParticle;
     private int startDelay = 0;
 
     // we assume that the LED pin of the RGB sensor is connected to
@@ -84,6 +86,8 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             (WHEEL_DIAMETER_INCHES * 3.14159);
     static final double DRIVE_SPEED = 0.6;
     static final double TURN_SPEED = 0.5;
+    static final double SLOW_SPEED = .25;
+    static final int LAUNCH_COUNTS = 1120;           // Number of counts to get launcher cocked.
 
     @Override
     public void runOpMode() {
@@ -116,15 +120,20 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         this.startPosition = autoConfig.getStartPosition();
         this.parkLocation = autoConfig.getParkLocation();
         this.pressBeacon = autoConfig.getPressBeacon();
+        this.launchParticle = autoConfig.getLaunchParticle();
         if (pressBeacon) {
             // turn the forward LED off because we are reading direct light not reflective light.
             robot.deviceInterfaceModule.setDigitalChannelState(FORWARD_LED_CHANNEL, false);
-            // turn the down LED on because we are reading reflective light not direct light.
-            robot.deviceInterfaceModule.setDigitalChannelState(DOWN_LED_CHANNEL, true);
+        }
+
+        if (launchParticle) {
+            robot.launchMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
         telemetry.addData("Alliance/Delay", "%s - %d seconds", this.alliance, this.startDelay);
         telemetry.addData("Start Position", "%s", this.startPosition);
+        telemetry.addData("Park Position", "%s", this.parkLocation);
+        telemetry.addData("Launch Particle", "%s", this.launchParticle);
         telemetry.addData("Waiting for Start", "");
         telemetry.update();
 
@@ -132,12 +141,6 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         waitForStart();
         // Delay if driver requested.
         sleep(this.startDelay * 1000);
-
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Path", "Starting at %7d :%7d",
-                robot.leftMotor.getCurrentPosition(),
-                robot.rightMotor.getCurrentPosition());
-        telemetry.update();
 
         // Run the selected path.
         runPath();
@@ -151,13 +154,19 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
      *  startPosition, parkLocation and pressButton.
      */
     private void runPath() {
-        AutonomousConfiguration.AllianceColor detectedColor;
-        // First segments: Start center
+        // Cock and launch particle
+        // Robot will return to the wall after launching
+        if (this.launchParticle) {
+            runLaunchParticle();
+        }
+
+        // We are NOT pressing the beacons
         if (!this.pressBeacon) {
             if (this.startPosition == AutonomousConfiguration.StartPosition.Center) {
+                        // Start Center
                 encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
                 encoderDrive(TURN_SPEED, 10, -10, 5.0);
-            } else {        // Start left
+            } else {    // Start left
                 encoderDrive(DRIVE_SPEED, 30, 30, 5.0);
                 encoderDrive(TURN_SPEED, 5, -5, 5.0);
                 encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
@@ -166,51 +175,75 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         }
 
         // Try to press beacons.
-        //TODO This needs testing, sensors and refinement.
         if (this.pressBeacon) {
+            // Line up on the first beacon
             encoderDrive(TURN_SPEED, 4, 0, 5.0);
             encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
             encoderDrive(TURN_SPEED, 4, 0, 5.0);
 
-//            encoderDrive(TURN_ SPEED, -2.5, 2.5, 5.0);
-            //TODO Need to look for white line here.
-//            encoderDrive(TURN_SPEED, 2.5, -2.5, 5.0);
-            // Pressing here.
-            encoderDrive(DRIVE_SPEED, 10, 10, 5.0);
-            //TODO Add color detect logic
-            detectedColor = getBeaconColor();
-            // Correct color?
-            if (detectedColor != this.alliance) {
-                while (opModeIsActive()) {
-                    if (runtime.seconds() <= 5) {
-                        encoderDrive(DRIVE_SPEED, -2, -2, 5.0);
-                        encoderDrive(DRIVE_SPEED, 2, 2, 5.0);
-                        break;
-                    }
-                }
-            }
+            // Press the first beacon.
+            this.runPressBeacon();
 
-            encoderDrive(DRIVE_SPEED, -5, -5, 5.0);
-            encoderDrive(TURN_SPEED, -10, 10, 5.0);
+            // Go find the second one
+            encoderDrive(DRIVE_SPEED, -10, -10, 4.0);
+            encoderDrive(TURN_SPEED, -10, 10, 3.0);
             encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
-            encoderDrive(TURN_SPEED, -2.5, 2.5, 5.0);
-            //TODO Need to look for white line here.
-            encoderDrive(TURN_SPEED, 2.5, -2.5, 5.0);
-            // Pressing here.
-            encoderDrive(DRIVE_SPEED, 5, 5, 5.0);
-            //TODO Add color detect logic
-            encoderDrive(DRIVE_SPEED, -5, -5, 5.0);
-            // Assume ramp park
             encoderDrive(TURN_SPEED, 10, -10, 5.0);
-            encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
+            // Now press the second beacon.
+            this.runPressBeacon();
+
+            // Assume ramp park, just return.
+            encoderDrive(TURN_SPEED, 10, -10, 5.0);
+            encoderDrive(DRIVE_SPEED, 48, 48, 6.0);
             return;
         }
 
         // Park location:  Ramp
         if (this.parkLocation == AutonomousConfiguration.ParkLocation.Ramp) {
             encoderDrive(TURN_SPEED, 5.0, -5.0, 5.0);
-            encoderDrive(DRIVE_SPEED, 42, 42, 5.0);
+            encoderDrive(DRIVE_SPEED, 42, 42, 6.0);
         }
+    }
+
+    // Assume we are lined up 10 inches from the beacon.
+    private void runPressBeacon() {
+        encoderDrive(DRIVE_SPEED, 8, 8, 4.0);
+        encoderDrive(SLOW_SPEED, 2, 2, 2.0);
+        encoderDrive(SLOW_SPEED, -2, -2, 2.0);
+        detectedColor = getBeaconColor();
+        // Correct color?
+        if (detectedColor != this.alliance) {
+            while (opModeIsActive()) {
+                runtime.reset();
+                if (runtime.seconds() > 5) {
+                    // Press and then backup
+                    encoderDrive(DRIVE_SPEED, 2, 2, 2.0);
+                    encoderDrive(DRIVE_SPEED, -2, -2, 2.0);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void runLaunchParticle() {
+        // Move away from the wall.
+        encoderDrive(SLOW_SPEED, 2, 2, 2);
+        //TODO Do we need BRAKE?
+        robot.launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        robot.launchMotor.setPower(.9);
+        while (opModeIsActive()) {
+            robot.launchMotor.setTargetPosition(LAUNCH_COUNTS);
+            runtime.reset();        //Safety timer
+            if (runtime.seconds() >= 5 ||
+                    robot.launchMotor.getCurrentPosition() >= LAUNCH_COUNTS) {
+                break;
+            }
+        }
+
+        // Stop motor
+        robot.launchMotor.setPower(0);
+        // Move back to the wall.
+        encoderDrive(SLOW_SPEED, -2, -2, 2);
     }
 
     /*
@@ -266,7 +299,6 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
      *  Check the beacon color and return it.
      */
     private AutonomousConfiguration.AllianceColor getBeaconColor() {
-        UtilityFunctions.BeaconColor detectedColor = null;
         // Timer to control how long we look at the color.
         ElapsedTime lookTime = new ElapsedTime();
         double timeToLook = 500;
