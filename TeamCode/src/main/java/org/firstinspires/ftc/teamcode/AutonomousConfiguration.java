@@ -26,6 +26,7 @@ public class AutonomousConfiguration {
     private StartPosition startPosition;
     private ParkLocation parkLocation;
     private boolean pressBeacon;
+    private boolean launchParticle;
     private Gamepad gamepad1 = null;
 
     // Seconds to delay before starting opmode.
@@ -80,6 +81,10 @@ public class AutonomousConfiguration {
         return pressBeacon;
     }
 
+    public boolean getLaunchParticle() {
+        return launchParticle;
+    }
+
     public void ShowMenu() {
         boolean bCurrStatePadLeft = false;
         boolean bPrevStatePadLeft = false;
@@ -123,6 +128,10 @@ public class AutonomousConfiguration {
                 pressBeacon = !pressBeacon;
             }
 
+            if (gamepad1.left_bumper) {
+                launchParticle = !launchParticle;
+            }
+
             // Only allow loop exit if alliance has been selected.
             if (gamepad1.start && alliance != AllianceColor.None) {
                 break;
@@ -133,12 +142,14 @@ public class AutonomousConfiguration {
             telemetry.addData("", "y to cycle start position");
             telemetry.addData("", "a to cycle park location");
             telemetry.addData("", "right bumper to cycle press beacon");
+            telemetry.addData("", "left bumper to cycle launch particle");
             telemetry.addData("Finished", "Press gamepad Start");
             telemetry.addData("Selected", "Alliance %s", alliance);
             telemetry.addData("", "Start delay %d", startDelay);
             telemetry.addData("", "Start position %s", startPosition);
             telemetry.addData("", "Park location %s", parkLocation);
             telemetry.addData("", "Press the beacon %s", pressBeacon);
+            telemetry.addData("", "Launch particle %s", launchParticle);
             telemetry.update();
         } while (true);
     }
