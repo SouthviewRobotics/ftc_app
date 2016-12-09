@@ -161,19 +161,17 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             runLaunchParticle();
         }
 
-        // We are NOT pressing the beacons
-//        if (!this.pressBeacon) {
-            if (this.startPosition == AutonomousConfiguration.StartPosition.Center) {
-                        // Start Center
-                encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
-                encoderDrive(TURN_SPEED, 9.5, -9.5, 5.0);
-            } else {    // Start left
-                encoderDrive(DRIVE_SPEED, 30, 30, 5.0);
-                encoderDrive(TURN_SPEED, 5, -5, 5.0);
-                encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
-                encoderDrive(TURN_SPEED, 5, -5, 5.0);
-            }
-//        }
+        //TODO Change this if we want to go straight to the beacons.
+        if (this.startPosition == AutonomousConfiguration.StartPosition.Center) {
+            // Start Center
+            encoderDrive(DRIVE_SPEED, 40, 40, 5.0);
+            encoderDrive(TURN_SPEED, 9.5, -9.5, 5.0);
+        } else {    // Start left
+            encoderDrive(DRIVE_SPEED, 30, 30, 5.0);
+            encoderDrive(TURN_SPEED, 5, -5, 5.0);
+            encoderDrive(DRIVE_SPEED, 12, 12, 5.0);
+            encoderDrive(TURN_SPEED, 5, -5, 5.0);
+        }
 
         // Try to press beacons.
         if (this.pressBeacon) {
@@ -186,15 +184,16 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
             this.runPressBeacon();
 
             // Go find the second one
-            encoderDrive(DRIVE_SPEED, -9.5, -9.5, 4.0);
+            encoderDrive(DRIVE_SPEED, -13, -13, 4.0);
             encoderDrive(TURN_SPEED, -9.5, 9.5, 3.0);
             encoderDrive(DRIVE_SPEED, 48, 48, 5.0);
             encoderDrive(TURN_SPEED, 9.5, -9.5, 5.0);
             // Now press the second beacon.
             this.runPressBeacon();
 
-            // Assume ramp park, just return.
-            encoderDrive(TURN_SPEED, 9.5, -9.5, 5.0);
+            // Assume ramp park when pressing beacons.
+            encoderDrive(DRIVE_SPEED, -3, -3, 3.0);
+            encoderDrive(TURN_SPEED, 9.5, -9.5, 3.0);
             encoderDrive(DRIVE_SPEED, 48, 48, 6.0);
             return;
         }
@@ -206,7 +205,7 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
         }
     }
 
-    // Assume we are lined up 10 inches from the beacon.
+    // Assume we are lined up on the beacon.
     private void runPressBeacon() {
         encoderDrive(DRIVE_SPEED, 13, 13, 4.0);
         encoderDrive(SLOW_SPEED, 2, 2, 2.0);
@@ -218,8 +217,8 @@ public class CakePushbotAutoDriveByEncoder_Linear extends LinearOpMode {
                 runtime.reset();
                 if (runtime.seconds() > 5) {
                     // Press and then backup
-                    encoderDrive(DRIVE_SPEED, 2, 2, 2.0);
-                    encoderDrive(DRIVE_SPEED, -2, -2, 2.0);
+                    encoderDrive(SLOW_SPEED, 2, 2, 2.0);
+                    encoderDrive(SLOW_SPEED, -2, -2, 2.0);
                     break;
                 }
             }
