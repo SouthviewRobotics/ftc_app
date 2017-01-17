@@ -82,8 +82,10 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap); //Maps hardware
+/*
         robot.pushLeft.setPosition(-1);
         robot.pushRight.setPosition(1);
+*/
 //        robot.forkRaise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -106,7 +108,9 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
      */
     @Override
     public void start() {
-    }
+        robot.pushLeft.setPosition(-1);
+        robot.pushRight.setPosition(1);
+   }
 
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -115,8 +119,9 @@ public class CakePushbotTeleopTank_Iterative extends OpMode {
 
     public void loop() {
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        double leftDriveMotorPower = -gamepad1.left_stick_y;
-        double rightDriveMotorPower = -gamepad1.right_stick_y;
+        // The robot front is reversed, so no more negate!
+        double leftDriveMotorPower = gamepad1.left_stick_y;
+        double rightDriveMotorPower = gamepad1.right_stick_y;
         // Use a smooth start algorithm
         robot.leftMotor.setPower(UtilityFunctions.ScaleMotorCube(leftDriveMotorPower)); //Makes the robot run
         robot.rightMotor.setPower(UtilityFunctions.ScaleMotorCube(rightDriveMotorPower));
