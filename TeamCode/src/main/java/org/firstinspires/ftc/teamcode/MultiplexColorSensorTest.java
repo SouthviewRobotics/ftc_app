@@ -68,6 +68,7 @@ public class MultiplexColorSensorTest extends OpMode
             telemetry.addLine("Sensor " + ports[i]);
             telemetry.addData("CRGB", "%5d %5d %5d %5d",
                               crgb[0], crgb[1], crgb[2], crgb[3]);
+//            telemetry.addLine("GetCRGB", "Clear %5d", muxColor.GetCRGB(MultiplexColorSensor.adaFruitColor.Clear, i));
         }
 
         telemetry.update();

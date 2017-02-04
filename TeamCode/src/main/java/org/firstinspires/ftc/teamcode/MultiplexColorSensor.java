@@ -68,6 +68,13 @@ public class MultiplexColorSensor {
     public static int GAIN_16X = 0x02;
     public static int GAIN_60X = 0x03;
 
+    public enum adaFruitColor {
+        Clear,
+        Red,
+        Green,
+        Blue
+    }
+
     /**
      * Initializes Adafruit color sensors on the specified ports of the I2C
      * multiplexer.
@@ -156,5 +163,16 @@ public class MultiplexColorSensor {
             crgb[i] = (adaCache[2 * i] & 0xFF) + (adaCache[2 * i + 1] & 0xFF) * 256;
         }
         return crgb;
+    }
+
+    /**
+     * Get a color from one of the adaFruit color sensors.
+     * @param color The color to return.
+     * @param port The sensor port to read.
+     * @return int The value of the color.
+     */
+    public int GetCRGB(adaFruitColor color, int port) {
+        int[] colors = getCRGB(port);
+        return colors[color.ordinal()];
     }
 }
