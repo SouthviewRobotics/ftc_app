@@ -30,15 +30,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 /**
  * Created by Chris D on 10/5/2016
- *
+ * <p>
  * In this example, you need to create a device configuration that lists two
  * "I2C Device"s, one named "mux" and the other named "ada". There are two
  * Adafruit color sensors plugged into the I2C multiplexer on ports 0 and 3.
  */
-@TeleOp(name="MultiplexColorSensorTest", group="Iterative Opmode")
+@TeleOp(name = "MultiplexColorSensorTest", group = "Test")
 //@Disabled
-public class MultiplexColorSensorTest extends OpMode
-{
+public class MultiplexColorSensorTest extends OpMode {
     MultiplexColorSensor muxColor;
     int[] ports = {0, 3};
 
@@ -46,8 +45,8 @@ public class MultiplexColorSensorTest extends OpMode
     public void init() {
         int milliSeconds = 48;
         muxColor = new MultiplexColorSensor(hardwareMap, "mux", "ada",
-                                            ports, milliSeconds,
-                                            MultiplexColorSensor.GAIN_16X);
+                ports, milliSeconds,
+                MultiplexColorSensor.GAIN_16X);
     }
 
     @Override
@@ -62,13 +61,17 @@ public class MultiplexColorSensorTest extends OpMode
 
     @Override
     public void loop() {
-        for (int i=0; i<ports.length; i++) {
+        for (int i = 0; i < ports.length; i++) {
             int[] crgb = muxColor.getCRGB(ports[i]);
 
             telemetry.addLine("Sensor " + ports[i]);
             telemetry.addData("CRGB", "%5d %5d %5d %5d",
-                              crgb[0], crgb[1], crgb[2], crgb[3]);
-//            telemetry.addLine("GetCRGB", "Clear %5d", muxColor.GetCRGB(MultiplexColorSensor.adaFruitColor.Clear, i));
+                    crgb[0], crgb[1], crgb[2], crgb[3]);
+            telemetry.addData("GetCRGB", "%5d %5d %5d %5d",
+                    muxColor.GetCRGB(MultiplexColorSensor.adaFruitColor.Clear, i),
+                    muxColor.GetCRGB(MultiplexColorSensor.adaFruitColor.Red, i),
+                    muxColor.GetCRGB(MultiplexColorSensor.adaFruitColor.Green, i),
+                    muxColor.GetCRGB(MultiplexColorSensor.adaFruitColor.Blue, i));
         }
 
         telemetry.update();
